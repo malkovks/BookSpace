@@ -11,6 +11,7 @@ import SwiftData
 
 @main
 struct BookSpaceApp: App {
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
@@ -23,13 +24,10 @@ struct BookSpaceApp: App {
             fatalError("Could not create ModelContainer: \(error)")
         }
     }()
-    
-    
-    //Test commit
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
         }
         .modelContainer(sharedModelContainer)
     }
