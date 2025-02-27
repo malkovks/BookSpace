@@ -82,7 +82,7 @@ struct SideMenuView: View {
             
         }
         .padding(.vertical, 20)
-        .frame(maxWidth: 250,alignment: .leading)
+        .frame(maxWidth: UIScreen.main.bounds.width * 0.75 ,alignment: .leading)
         .background(Color(.lightGray))
         .shadow(radius: 5)
     }

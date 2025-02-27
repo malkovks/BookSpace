@@ -11,7 +11,5 @@ final class BookCollectionViewModel: ObservableObject {
     var isSearchFieldVisible = false
     var searchText: String = ""
     
-    var isSideMenuVisible: Bool = false
-    var selectedCategory: SideMenuCategories = .main
 }
 

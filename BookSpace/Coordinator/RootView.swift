@@ -9,51 +9,51 @@ import SwiftUI
 
 struct RootView: View {
     @StateObject private var coordinator = AppCoordinator()
+    @State private var rightButtons: AnyView = AnyView(EmptyView())
+    @State private var isNavigationBarHidden: Bool = false
     
     var body: some View {
         NavigationStack {
-            ZStack(alignment: .top) {
+            ZStack(alignment: .topLeading) {
                 contentView
                     .frame(maxWidth: .infinity,maxHeight: .infinity)
                     .transition(.opacity)
                 VStack {
-                    CustomNavigationBar(title: coordinator.selectedCategory.title, isSearching: .constant(false), searchText: .constant("")) {
+                    CustomNavigationBar(title: coordinator.selectedCategory.title) {
                         Button {
                             withAnimation {
                                 coordinator.isSideMenuVisible.toggle()
-                                print("Must open menu")
                             }
-
+                            
                         } label: {
                             createImage("menucard.fill")
                         }
                     } rightButtons: {
-                        HStack {
-                            Button {
-                                print("Must open search")
-                            } label: {
-                                createImage("magnifyingglass")
-                            }
-                            
-                            Button {
-                                print("sort button")
-                            } label: {
-                                createImage("line.3.horizontal.decrease.circle")
-                            }
-                        }
+                        rightButtons
                     }
+                    .opacity(isNavigationBarHidden ? 0 : 1)
                 }
                 if coordinator.isSideMenuVisible {
-                    SideMenuView(selectedCategory: $coordinator.selectedCategory) {
-                        withAnimation {
-                            coordinator.isSideMenuVisible.toggle()
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea(.all)
+                        .onTapGesture {
+                            withAnimation {
+                                coordinator.isSideMenuVisible = false
+                            }
                         }
-                    }
-                    .frame(width: 250)
-                    .transition(.move(edge: .leading))
-                    .zIndex(2)
                 }
+                
+                SideMenuView(selectedCategory: $coordinator.selectedCategory) {
+                    withAnimation {
+                        coordinator.isSideMenuVisible.toggle()
+                    }
+                }
+                .frame(width: UIScreen.main.bounds.width * 0.75)
+                .offset(x: coordinator.isSideMenuVisible ? 0 : -UIScreen.main.bounds.width * 0.75)
+                .transition(.move(edge: .leading))
+                .zIndex(1)
             }
+            .animation(.easeInOut, value: coordinator.isSideMenuVisible)
         }
     }
     
@@ -61,11 +61,20 @@ struct RootView: View {
     private var contentView: some View {
         switch coordinator.selectedCategory {
         case .main:
-            BookCollectionView()
+            BookCollectionView { buttons in
+                rightButtons = AnyView(buttons)
+            } needToHideNavigation: { isHidden in
+                isNavigationBarHidden = isHidden
+            }
+
         case .savedBooks:
-            SavedBooksView()
+            SavedBooksView { buttons in
+                rightButtons = AnyView(buttons)
+            }
         case .settings:
-            SettingsView()
+            SettingsView { buttons in
+                rightButtons = AnyView(buttons)
+            }
         }
     }
 }

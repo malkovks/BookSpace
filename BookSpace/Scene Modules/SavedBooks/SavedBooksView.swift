@@ -9,11 +9,29 @@
 import SwiftUI
 
 struct SavedBooksView: View {
+    var updateRightButtons: (_ buttons: AnyView) -> Void
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack {
+            ZStack(alignment: .top) {
+                Text("Books Collection View")
+            }
+            .onAppear {
+                updateRightButtons(AnyView(
+                HStack {
+                    Button {
+                        print("heart button")
+                    } label: {
+                        createImage("heart")
+                    }
+                }))
+            }
+        }
     }
 }
 
 #Preview {
-    SavedBooksView()
+    SavedBooksView { buttons in
+        
+    }
 }

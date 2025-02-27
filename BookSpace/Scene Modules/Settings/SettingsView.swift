@@ -9,11 +9,24 @@
 import SwiftUI
 
 struct SettingsView: View {
+    var updateRightButtons: (_ buttons: AnyView) -> Void
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack {
+            ZStack(alignment: .top) {
+                Text("Books Collection View")
+            }
+            .onAppear {
+                updateRightButtons(AnyView(
+                    Text("No buttons")
+                ))
+            }
+        }
     }
 }
 
 #Preview {
-    SettingsView()
+    SettingsView { buttons in
+        
+    }
 }
