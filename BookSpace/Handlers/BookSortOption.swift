@@ -11,4 +11,13 @@ import Foundation
 enum BookSortOption {
     case newest
     case classic
+    
+    var urlValue: String {
+        switch self {
+        case .newest:
+            return "newest"
+        case .classic:
+            return "relevance"
+        }
+    }
 }

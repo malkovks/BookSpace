@@ -16,8 +16,8 @@ class GoogleBooksApi {
     private let apiKey: String = "AIzaSyCFnAsKgGoe8AKu_Y_yVHvr5ULTJu6bpdQ"
     private let baseUrl: String = "https://www.googleapis.com/books/v1/volumes"
     
-    func fetchData(query: String, sortOption: BookSortOption) async throws -> BookResponse {
-        guard let url = createURL(query: query, sort: sortOption).url else {
+    func fetchData(query: String, sortOption: BookSortOption = .newest,filter: FilterCategories = .ebooks) async throws -> BookResponse {
+        guard let url = createURL(query: query, sort: sortOption,filter: filter).url else {
             throw  ApiErrorHandler.invalidURL
         }
         
@@ -36,26 +36,19 @@ class GoogleBooksApi {
         return booksResponse
     }
     
-    private func createURL(query: String, sort: BookSortOption) -> URLComponents {
+    private func createURL(query: String, sort: BookSortOption,filter: FilterCategories) -> URLComponents {
         var components = URLComponents()
         components.scheme = "https"
         components.host = "www.googleapis.com"
         components.path = "/books/v1/volumes"
-        
-        let orderByValue: String = {
-            switch sort {
-            case .newest:
-                return "newest"
-            case .classic:
-                return "relevance"
-            }
-        }()
+
         
         let searchQuery = query.isEmpty ? "subject:fiction" : query
         
         let queryItems = [
             URLQueryItem(name: "q", value: searchQuery),
-            URLQueryItem(name: "orderBy", value: orderByValue),
+            URLQueryItem(name: "orderBy", value: sort.urlValue),
+            URLQueryItem(name: "filter", value: filter.urlValue),
             URLQueryItem(name: "maxResults", value: "10"),
             URLQueryItem(name: "key", value: apiKey)
         ]

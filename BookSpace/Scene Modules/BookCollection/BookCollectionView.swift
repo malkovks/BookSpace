@@ -13,6 +13,9 @@ struct BookCollectionView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel = BookCollectionViewModel()
     
+    @State private var isFilterOpened: Bool = false
+    @State private var selectedFilter: FilterCategories = .ebooks
+    
     @State private var searchResults: [String] = ["SwiftUI", "UIKit", "Combine", "Core Data"]
     @State var isSearchOpened: Bool = false {
         didSet {
@@ -29,75 +32,73 @@ struct BookCollectionView: View {
     var needToHideNavigation: (_ isHidden: Bool) -> Void
     
     var columns: [GridItem] = Array(repeating: GridItem(.flexible(),spacing: 10), count: 2)
-    var mockData: [BookModel] =  [BookModel(),
-                                  BookModel(),
-                                  BookModel(),
-                                  BookModel(),
-                                  BookModel(),
-                                  BookModel(),
-                                  BookModel(),
-                                  BookModel(),
-                                  BookModel()]
 
     var body: some View {
-        ZStack(alignment: .top) {
-            VStack {
-                    
-                ScrollView(.vertical) {
-                    LazyVGrid(columns: columns,alignment: .center, spacing: 10) {
-                        ForEach(0...9, id: \.self) { book in
-                            Color.red.frame(height: 200)
+        GeometryReader { geometry in
+            ZStack(alignment: .top) {
+                VStack {
+                    ScrollView(.vertical) {
+                        LazyVGrid(columns: columns,alignment: .center, spacing: 10) {
+                            ForEach(0...9, id: \.self) { book in
+                                Color.blue.opacity(0.4).frame(height: 200)
+                            }
                         }
                     }
+                    .padding(.top,80)
+                    .padding()
                 }
-                .opacity(isSearchOpened ? 0 : 1)
-                .padding()
+                
+                if isFilterOpened {
+                    FilterBooksView(filter: $selectedFilter) {
+                        isFilterOpened.toggle()
+                    }
+                    .frame(width: geometry.size.width / 2, height: geometry.size.height/3)
+                    .position(x: geometry.size.width - geometry.size.width / 3, y: geometry.size.height/3)
+                    .transition(.move(edge: .trailing))
+                }
             }
-        }
-        .overlay {
-            if isSearchOpened {
-                searchFieldView
+            .overlay {
+                if isSearchOpened {
+                    searchFieldView
+                }
             }
-        }
-        .onAppear {
-            updateRightButtons(AnyView(
-                HStack {
-                    Button {
-                        withAnimation {
-                            isSearchOpened.toggle()
+            .onAppear {
+                updateRightButtons(AnyView(
+                    HStack {
+                        Button {
+                            withAnimation {
+                                isSearchOpened.toggle()
+                            }
+                        } label: {
+                            createImage("magnifyingglass")
                         }
-                    } label: {
-                        createImage("magnifyingglass")
-                    }
-                    
-                    Button {
-                        print("filter items")
-                    } label: {
-                        createImage("line.3.horizontal.decrease")
-                    }
-                }))
+                        
+                        Button {
+                            withAnimation {
+                                isFilterOpened.toggle()
+                            }
+                        } label: {
+                            createImage("line.3.horizontal.decrease")
+                        }
+                    }))
+            }
         }
+        
     }
     
     private var searchFieldView: some View {
-        CustomSearchBar(searchResults: searchResults,placeholder: "Search", text: $viewModel.searchText) {
+        CustomSearchBar(searchResults: $searchResults,placeholder: "Search", text: $viewModel.searchText) {
             isSearchOpened = false
         } onClose: {
             isSearchOpened = false
         }
-        .foregroundStyle(.yellow)
-        .background(Color(.lightGray))
+        .foregroundStyle(.blackText)
         .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .top)
-        .transition(.move(edge: .top).combined(with: .slide))
-        .opacity(isSearchOpened ? 1 : 0)
+        .transition(.opacity)
     }
 }
 
-struct BookModel {
-    let id: UUID = UUID()
-    let image: Image = .init(systemName: "info.circle")
-    let title: String = "Example"
-}
+
 
 #Preview {
     BookCollectionView { buttons in

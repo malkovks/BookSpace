@@ -33,6 +33,7 @@ struct RootView: View {
                     }
                     .opacity(isNavigationBarHidden ? 0 : 1)
                 }
+                
                 if coordinator.isSideMenuVisible {
                     Color.black.opacity(0.4)
                         .ignoresSafeArea(.all)
@@ -79,3 +80,6 @@ struct RootView: View {
     }
 }
 
+#Preview {
+    RootView()
+}

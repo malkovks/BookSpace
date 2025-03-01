@@ -7,9 +7,10 @@
 
 import SwiftUI
 
+
 final class BookCollectionViewModel: ObservableObject {
     var isSearchFieldVisible = false
-    var searchText: String = ""
+    @Published var searchText: String = ""
     
 }
 
