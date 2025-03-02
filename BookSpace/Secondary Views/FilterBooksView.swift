@@ -44,6 +44,13 @@ struct FilterBooksView: View {
             .scrollContentBackground(.hidden)
             .listStyle(.plain)
         }
+        .padding()
         .background(Color.white)
+        .clipShape(.rect(cornerRadius: 12))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.black.opacity(0.4), lineWidth: 1)
+        }
+        .shadow(color: .black.opacity(0.1), radius: 4,x: 0,y: 2)
     }
 }

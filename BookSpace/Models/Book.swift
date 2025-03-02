@@ -20,13 +20,14 @@ struct Book: Codable {
     }
     
     struct VolumeInfo: Codable {
-        let title, subtitle: String
+        let title: String
+        let subtitle: String?
         let authors: [String]
         let publisher, publishedDate, description: String
         let pageCount: Int
         let printType: String
         let categories: [String]
-        let averageRating, ratingsCount: Int
+        let averageRating, ratingsCount: Int?
         let maturityRating: String
         let allowAnonLogging: Bool
         let contentVersion: String

@@ -33,6 +33,6 @@ struct CustomNavigationBar<LeftButton: View, RightButtons: View>: View {
             
         }
         .padding(.horizontal,20)
-        .background(.skyBlue)
+        .background(.paperYellow)
     }
 }

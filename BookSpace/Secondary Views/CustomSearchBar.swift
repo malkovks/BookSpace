@@ -46,7 +46,7 @@ struct CustomSearchBar: View {
                 .foregroundStyle(.black)
                 .frame(maxWidth: .infinity,maxHeight: 80,alignment: .leading)
                 .padding(15)
-                .background(.skyBlue)
+                .background(.paperYellow)
                 
                 listView
             }
@@ -66,7 +66,7 @@ struct CustomSearchBar: View {
                 createImage("arrow.right",secondaryColor: .red)
                     .opacity(0.4)
             }
-            .listRowBackground(Color.skyBlue)
+            .listRowBackground(Color.paperYellow)
         }
         .scrollContentBackground(.hidden)
         .foregroundStyle(.black)
