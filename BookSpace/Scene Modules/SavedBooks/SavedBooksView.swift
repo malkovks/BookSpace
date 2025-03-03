@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct SavedBooksView: View {
+    @Environment(\.modelContext) private var modelContext
     var updateRightButtons: (_ buttons: AnyView) -> Void
 
     var body: some View {

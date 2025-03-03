@@ -12,6 +12,7 @@ enum SideMenuCategories: String, CaseIterable, Identifiable {
     
     case main
     case savedBooks
+    case readLater
     case settings
     
     var title: String {
@@ -22,6 +23,8 @@ enum SideMenuCategories: String, CaseIterable, Identifiable {
             return "Saved"
         case .settings:
             return "Settings"
+        case .readLater:
+            return "Read Later"
         }
     }
     
@@ -33,6 +36,8 @@ enum SideMenuCategories: String, CaseIterable, Identifiable {
             return Image(systemName: "heart.square.fill")
         case .settings:
             return Image(systemName: "gear.badge")
+        case .readLater:
+            return Image(systemName: "bookmark.fill")
         }
     }
 }

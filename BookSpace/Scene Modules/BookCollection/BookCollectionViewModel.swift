@@ -6,9 +6,11 @@
 // Copyright (c) 2024 Malkov Konstantin . All rights reserved.
 
 import SwiftUI
+import SwiftData
 
 
 final class BookCollectionViewModel: ObservableObject {
+    var modelContext: ModelContext
     var isSearchFieldVisible = false
     @Published var searchText: String = ""
     
@@ -29,6 +31,10 @@ final class BookCollectionViewModel: ObservableObject {
     @Published var selectedBook: Book?
     @Published var navigationPath = NavigationPath()
     
+    init(modelContext: ModelContext){
+        self.modelContext = modelContext
+    }
+    
     private let api = GoogleBooksApi()
 }
 
@@ -38,7 +44,7 @@ extension BookCollectionViewModel {
         isLoading = true
         errorMessage = nil
         
-            /*
+
         do {
             //query request is default
             let response = try await api.fetchData(query: "mafia")
@@ -48,16 +54,15 @@ extension BookCollectionViewModel {
             errorMessage = error.localizedDescription
             print("Fetching failed: \(error)")
         }
-             */
+             
          
-        do {
-            
-            try await Task.sleep(nanoseconds: 2_000_000_000) // 2 sec test request
-        } catch {
-            errorMessage = "Failed to simulate loading"
-        }
-        
-        books = bookMockModel
+//        do {
+//            
+//            try await Task.sleep(nanoseconds: 2_000_000_000) // 2 sec test request
+//        } catch {
+//            errorMessage = "Failed to simulate loading"
+//        }
+//        books = bookMockModel
         isLoading = false
     }
     

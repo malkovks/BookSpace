@@ -9,7 +9,7 @@
 import SwiftUI
 
 class BookDetailViewModel: ObservableObject {
-    @Published var backgroundColor: Color = .white
+    @Published var backgroundColor: Color = Color(UIColor.secondarySystemBackground)
     
     func extractColor(from image: Image){
         let uiImage = image.asUIImage()

@@ -39,7 +39,7 @@ let bookMockModel: [Book] = [
             country: "US",
             saleability: "FOR_SALE",
             isEbook: true
-        )
+        ), accessInfo: Book.AccessInfo(country: "Ru", epub: .init(isAvailable: true, acsTokenLink: "http://example.com/preview"), webReaderLink: "http://example.com/preview")
     ),
     Book(
        kind: "books#volume",
@@ -74,7 +74,7 @@ let bookMockModel: [Book] = [
            country: "US",
            saleability: "FOR_SALE",
            isEbook: true
-       )
+       ), accessInfo: Book.AccessInfo(country: "Ru", epub: .init(isAvailable: true, acsTokenLink: "http://example.com/preview"), webReaderLink: "http://example.com/preview")
    ),
     Book(
         kind: "books#volume",
@@ -109,7 +109,7 @@ let bookMockModel: [Book] = [
             country: "US",
             saleability: "FOR_SALE",
             isEbook: true
-        )
+        ), accessInfo: Book.AccessInfo(country: "Ru", epub: .init(isAvailable: true, acsTokenLink: "http://example.com/preview"), webReaderLink: "http://example.com/preview")
     ),
     Book(
         kind: "books#volume",
@@ -144,7 +144,7 @@ let bookMockModel: [Book] = [
             country: "US",
             saleability: "FOR_SALE",
             isEbook: true
-        )
+        ), accessInfo: Book.AccessInfo(country: "Ru", epub: .init(isAvailable: true, acsTokenLink: "http://example.com/preview"), webReaderLink: "http://example.com/preview")
     ),
     Book(
         kind: "books#volume",
@@ -179,6 +179,6 @@ let bookMockModel: [Book] = [
             country: "US",
             saleability: "NOT_FOR_SALE",
             isEbook: false
-        )
+        ), accessInfo: Book.AccessInfo(country: "Ru", epub: .init(isAvailable: true, acsTokenLink: "http://example.com/preview"), webReaderLink: "http://example.com/preview")
     )
 ]

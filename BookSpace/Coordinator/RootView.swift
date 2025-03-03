@@ -6,8 +6,15 @@
 // Copyright (c) 2024 Malkov Konstantin . All rights reserved.
 
 import SwiftUI
+import SwiftData
 
 struct RootView: View {
+    var sharedModelContainer: ModelContainer = {
+        let schema = Schema([PlannedBooks.self,SavedBooks.self])
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        return try! ModelContainer(for: schema, configurations: [modelConfiguration])
+    }()
+    
     @StateObject private var coordinator = AppCoordinator()
     @State private var rightButtons: AnyView = AnyView(EmptyView())
     @State private var isNavigationBarHidden: Bool = false
@@ -62,7 +69,7 @@ struct RootView: View {
     private var contentView: some View {
         switch coordinator.selectedCategory {
         case .main:
-            BookCollectionView { buttons in
+            BookCollectionView(viewModel: BookCollectionViewModel(modelContext: sharedModelContainer.mainContext)){ buttons in
                 rightButtons = AnyView(buttons)
             } needToHideNavigation: { isHidden in
                 isNavigationBarHidden = isHidden
@@ -72,10 +79,17 @@ struct RootView: View {
             SavedBooksView { buttons in
                 rightButtons = AnyView(buttons)
             }
+            .modelContext(sharedModelContainer.mainContext)
         case .settings:
             SettingsView { buttons in
                 rightButtons = AnyView(buttons)
             }
+            
+        case .readLater:
+            ReadLaterView { buttons in
+                rightButtons = AnyView(buttons)
+            }
+            .modelContext(sharedModelContainer.mainContext)
         }
     }
 }

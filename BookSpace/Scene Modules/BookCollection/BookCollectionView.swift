@@ -10,25 +10,28 @@ import SwiftUI
 import SwiftData
 
 struct BookCollectionView: View {
-    @Environment(\.modelContext) private var modelContext
-    @StateObject private var viewModel = BookCollectionViewModel()
-    
-    @State var isSearchOpened: Bool = false {
+    @State private var viewModel: BookCollectionViewModel
+    @State private var isSearchOpened: Bool = false {
         didSet {
             print("search opened: \(isSearchOpened)")
             withAnimation(.interpolatingSpring) {
                 needToHideNavigation(isSearchOpened)
             }
-            
         }
     }
     
     var updateRightButtons: (_ buttons: AnyView) -> Void
     var needToHideNavigation: (_ isHidden: Bool) -> Void
     
-    var columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 10),
-        GridItem(.flexible(), spacing: 10)
+    init(viewModel: BookCollectionViewModel, updateRightButtons: @escaping (_: AnyView) -> Void, needToHideNavigation: @escaping (_: Bool) -> Void) {
+        self.viewModel = viewModel
+        self.updateRightButtons = updateRightButtons
+        self.needToHideNavigation = needToHideNavigation
+    }
+    
+    private var columns: [GridItem] = [
+        GridItem(.adaptive(minimum: 150), spacing: 10),
+        GridItem(.adaptive(minimum: 150), spacing: 10)
     ]
 
     var body: some View {
@@ -37,7 +40,9 @@ struct BookCollectionView: View {
                 ZStack(alignment: .top) {
                     collectionView
                         .navigationDestination(for: BookIdentifiable.self) { bookWrapper in
-                            BookDetailView(book: bookWrapper.book)
+                            BookDetailView(book: bookWrapper.book) {
+                                viewModel.navigationPath.removeLast()
+                            }
                         }
                     
                     if viewModel.isFilterOpened {
@@ -102,6 +107,7 @@ struct BookCollectionView: View {
                                 .lineLimit(2)
                                 .multilineTextAlignment(.center)
                         }
+                        .frame(height: 250,alignment: .center)
                         .padding()
                         .foregroundStyle(.blackText)
                         .background(Color.paperYellow)
@@ -119,7 +125,6 @@ struct BookCollectionView: View {
             .padding()
         }
         .opacity(viewModel.isLoading ? 0 : 1)
-        
         
     }
     
@@ -153,15 +158,4 @@ struct BookCollectionView: View {
         .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .top)
         .transition(.opacity)
     }
-}
-
-
-
-#Preview {
-    BookCollectionView { buttons in
-        
-    } needToHideNavigation: { isHidden in
-        
-    }
-
 }

@@ -13,10 +13,27 @@ struct Book: Codable {
     let selfLink: String
     let volumeInfo: VolumeInfo
     let saleInfo: SaleInfo
+    let accessInfo: AccessInfo
     
     struct SaleInfo: Codable {
         let country, saleability: String
         let isEbook: Bool
+    }
+    
+    struct AccessInfo: Codable {
+        let country: String
+        let epub: Epub
+        let webReaderLink: String
+        
+        struct Epub: Codable {
+            let isAvailable: Bool
+            let acsTokenLink: String
+        }
+        
+        struct PDF: Codable {
+            let isAvailable: Bool
+            let acsTokenLink: String
+        }
     }
     
     struct VolumeInfo: Codable {
@@ -27,7 +44,7 @@ struct Book: Codable {
         let pageCount: Int
         let printType: String
         let categories: [String]
-        let averageRating, ratingsCount: Int?
+        let averageRating, ratingsCount: Double?
         let maturityRating: String
         let allowAnonLogging: Bool
         let contentVersion: String
