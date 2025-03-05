@@ -12,8 +12,6 @@ import SwiftData
 @main
 struct BookSpaceApp: App {
     
-    
-
     var body: some Scene {
         WindowGroup {
             RootView()

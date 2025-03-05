@@ -10,7 +10,7 @@ import SwiftUI
 import SwiftData
 
 struct BookCollectionView: View {
-    @State private var viewModel: BookCollectionViewModel
+    @StateObject private var viewModel: BookCollectionViewModel
     @State private var isSearchOpened: Bool = false {
         didSet {
             print("search opened: \(isSearchOpened)")
@@ -24,15 +24,10 @@ struct BookCollectionView: View {
     var needToHideNavigation: (_ isHidden: Bool) -> Void
     
     init(viewModel: BookCollectionViewModel, updateRightButtons: @escaping (_: AnyView) -> Void, needToHideNavigation: @escaping (_: Bool) -> Void) {
-        self.viewModel = viewModel
+        self._viewModel = StateObject(wrappedValue: viewModel)
         self.updateRightButtons = updateRightButtons
         self.needToHideNavigation = needToHideNavigation
     }
-    
-    private var columns: [GridItem] = [
-        GridItem(.adaptive(minimum: 150), spacing: 10),
-        GridItem(.adaptive(minimum: 150), spacing: 10)
-    ]
 
     var body: some View {
         NavigationStack(path: $viewModel.navigationPath) {
@@ -86,46 +81,42 @@ struct BookCollectionView: View {
             }
         }
     }
+
     
     private var collectionView: some View {
-        VStack {
-            ScrollView(.vertical) {
-                LazyVGrid(columns: columns,alignment: .center, spacing: 10) {
-                    ForEach(viewModel.books, id: \.id) { book in
-                        VStack {
-                            AsyncImageView(url: book.volumeInfo.imageLinks.thumbnail)
-                                .frame(width: 100, height: 150)
-                                .clipShape(.rect(cornerRadius: 10))
-                            
-                            Text(book.volumeInfo.title)
-                                .font(.headline)
-                                .foregroundColor(.black)
-                                .lineLimit(2)
-                                .multilineTextAlignment(.center)
-                            Text(book.volumeInfo.authors.joined(separator: ", "))
-                                .font(.subheadline)
-                                .lineLimit(2)
-                                .multilineTextAlignment(.center)
-                        }
-                        .frame(height: 250,alignment: .center)
-                        .padding()
-                        .foregroundStyle(.blackText)
-                        .background(Color.paperYellow)
-                        .clipShape(.rect(cornerRadius: 10))
-                        .onTapGesture {
-                            viewModel.navigationPath.append(BookIdentifiable(book: book))
+        GeometryReader { geometry in
+            let width = (geometry.size.width / 2) - 20
+            let columns = [GridItem(.fixed(width)), GridItem(.fixed(width))]
+            
+            VStack {
+                ScrollView(.vertical) {
+                    LazyVGrid(columns: columns,spacing: 20) {
+                        ForEach(viewModel.books, id: \.id) { book in
+                            BookCell(book: book,isFavorite: viewModel.isFavorite(book: book),isPlanned: viewModel.isPlanned(book: book)) { bookAction in
+                                switch bookAction {
+                                    
+                                case .favorite:
+                                    viewModel.toggleFavorite(book: book)
+                                case .share:
+                                    viewModel.shareSelectedBook(book)
+                                case .bookmark:
+                                    viewModel.toggleFutureReading(book: book)
+                                }
+                            }
+                            .frame(height: width * 1.5)
+                            .onTapGesture {
+                                viewModel.navigationPath.append(BookIdentifiable(book: book))
+                            }
                         }
                     }
                 }
+                .refreshable {
+                    await viewModel.fetchBooks()
+                }
+                .padding(.top,80)
             }
-            .refreshable {
-                await viewModel.fetchBooks()
-            }
-            .padding(.top,80)
-            .padding()
+            .opacity(viewModel.isLoading ? 0 : 1)
         }
-        .opacity(viewModel.isLoading ? 0 : 1)
-        
     }
     
     private var navigationButtons: some View {
@@ -159,3 +150,5 @@ struct BookCollectionView: View {
         .transition(.opacity)
     }
 }
+
+

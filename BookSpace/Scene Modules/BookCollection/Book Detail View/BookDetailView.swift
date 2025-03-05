@@ -112,41 +112,6 @@ struct BookDetailView: View {
     }
 }
 
-struct DetailRow: View {
-    var title: String
-    var value: String
-    
-    var body: some View {
-        HStack {
-            Text(title)
-                .foregroundStyle(.gray)
-            Spacer()
-            Text(value)
-                .fontDesign(.monospaced)
-                .foregroundStyle(.primary)
-                .multilineTextAlignment(.trailing)
-        }
-    }
-}
-
-struct LinkRow: View {
-    var title: String
-    var url: String
-    var systemImage: String
-    
-    var body: some View {
-        HStack {
-            Spacer()
-            Link(title, destination: URL(string: url)!)
-                .foregroundStyle(Color(uiColor: .blue))
-            Image(systemName: systemImage)
-                .foregroundStyle(Color(uiColor: .blue))
-            Spacer()
-            
-        }
-    }
-}
-
 #Preview {
     BookDetailView(book: bookMockModel.first!) {
         

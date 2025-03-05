@@ -16,6 +16,10 @@ struct ReadLaterView: View {
             ZStack(alignment: .top) {
                 Text("Read Later")
                     .font(.headline)
+                Image(systemName: "circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .padding()
             }
             .onAppear {
                 

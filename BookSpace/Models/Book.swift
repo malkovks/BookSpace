@@ -27,12 +27,12 @@ struct Book: Codable {
         
         struct Epub: Codable {
             let isAvailable: Bool
-            let acsTokenLink: String
+            let acsTokenLink: String?
         }
         
         struct PDF: Codable {
             let isAvailable: Bool
-            let acsTokenLink: String
+            let acsTokenLink: String?
         }
     }
     
