@@ -9,9 +9,32 @@ import SwiftUI
 
 struct BookDetailView: View {
     let book: Book
+    @State var isFavorite: Bool {
+        didSet {
+            isAddedToFavorite?(isFavorite)
+        }
+    }
+    
+    @State var isFutureReading: Bool {
+        didSet {
+            isAddedToReadLater?(isFutureReading)
+        }
+    }
+    
+    var onBack: () -> Void
+    var isAddedToFavorite: ((_ isFavorite: Bool) -> Void)?
+    var isAddedToReadLater: ((_ isReadLater: Bool) -> Void)?
     
     @StateObject private var viewModel = BookDetailViewModel()
-    var onBack: () -> Void
+    private var isFavoriteImageName: String {
+        return isFavorite ? "heart.fill" : "heart"
+    }
+    private var isFutureReadingImageName: String {
+        return isFutureReading ? "bookmark.fill" : "bookmark"
+    }
+    
+    
+    
     
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -73,7 +96,6 @@ struct BookDetailView: View {
                 
                 
             }
-            
             .listStyle(.insetGrouped)
             .padding(.top,80)
             navigationView
@@ -94,26 +116,24 @@ struct BookDetailView: View {
             } rightButtons: {
                 HStack {
                     Button {
-                        print("Add to favorite")
+                        isFavorite.toggle()
                     } label: {
-                        createImage("heart")
+                        createImage(isFavoriteImageName)
                     }
                     
                     Button {
-                        print("Read later")
+                        isFutureReading.toggle()
                     } label: {
-                        createImage("bookmark")
+                        createImage(isFutureReadingImageName)
                     }
                 }
-
             }
         }
-        
     }
 }
 
 #Preview {
-    BookDetailView(book: bookMockModel.first!) {
+    BookDetailView(book: bookMockModel.first!,isFavorite: true,isFutureReading: true) {
         
     }
 }

@@ -41,16 +41,21 @@ struct BookCell: View {
             AsyncImageView(url: book.volumeInfo.imageLinks.thumbnail)
                 .frame(width: 100, height: 150)
                 .clipShape(.rect(cornerRadius: 10))
-            
+            Spacer(minLength: 5)
             Text(book.volumeInfo.title)
                 .font(.headline)
                 .foregroundColor(.black)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 5)
             Text(book.volumeInfo.authors.joined(separator: ", "))
                 .font(.subheadline)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 5)
+            
         }
         .overlay(alignment: .topTrailing) {
             Menu {
@@ -79,6 +84,7 @@ struct BookCell: View {
                     .padding(5)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
         .foregroundStyle(.blackText)
         .background(Color.paperYellow)

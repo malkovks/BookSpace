@@ -63,7 +63,7 @@ extension BookCollectionViewModel {
         return false
     }
     
-    private func addToPlanned(book: Book) {
+    func addToPlanned(book: Book) {
         guard !isPlanned(book: book) else { return }
         
         let plannedBook = PlannedBooks(from: book)
@@ -77,7 +77,7 @@ extension BookCollectionViewModel {
         objectWillChange.send()
     }
     
-    private func removeFromPlanning(book: Book) {
+    func removeFromPlanning(book: Book) {
         guard isPlanned(book: book) else { return }
         
         let descriptor = FetchDescriptor<PlannedBooks>(predicate: #Predicate { plannedBook in
@@ -109,7 +109,7 @@ extension BookCollectionViewModel {
         return false
     }
     
-    private func addToFavorites(book: Book) {
+    func addToFavorites(book: Book) {
         guard !isFavorite(book: book) else { return }
         
         let savedBook = SavedBooks(from: book)
@@ -123,7 +123,7 @@ extension BookCollectionViewModel {
         objectWillChange.send()
     }
     
-    private func removeFromFavorite(book: Book) {
+    func removeFromFavorite(book: Book) {
         let descriptor = FetchDescriptor<SavedBooks>(predicate: #Predicate { savedBook in
             savedBook.id == book.id
         })
@@ -159,24 +159,25 @@ extension BookCollectionViewModel {
         errorMessage = nil
         
 
-//        do {
-//            //query request is default
-//            let response = try await api.fetchData(query: "mafia")
-//            books = response.items ?? []
-//            print("Fetched \(books.count) books.")
-//        } catch {
-//            errorMessage = error.localizedDescription
-//            print("Fetching failed: \(error)")
-//        }
+        do {
+            //query request is default
+            let response = try await api.fetchData(query: "mafia")
+            books = response.items ?? []
+            print("Fetched \(books.count) books.")
+        } catch {
+            errorMessage = error.localizedDescription
+            print("Fetching failed: \(error)")
+        }
              
          
-        do {
-            
-            try await Task.sleep(nanoseconds: 2_000_000_000) // 2 sec test request
-        } catch {
-            errorMessage = "Failed to simulate loading"
-        }
-        books = bookMockModel
+//        do {
+//            
+//            try await Task.sleep(nanoseconds: 2_000_000_000) // 2 sec test request
+//        } catch {
+//            errorMessage = "Failed to simulate loading"
+//        }
+//        books = bookMockModel
+        
         isLoading = false
     }
     
