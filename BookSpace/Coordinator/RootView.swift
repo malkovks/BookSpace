@@ -76,10 +76,11 @@ struct RootView: View {
             }
 
         case .savedBooks:
-            SavedBooksView { buttons in
+            SavedBooksView(viewModel: SavedBooksViewModel(modelContext: sharedModelContainer.mainContext)) { buttons in
                 rightButtons = AnyView(buttons)
+            } navigateToBookCollection: {
+                coordinator.selectedCategory = .main
             }
-            .modelContext(sharedModelContainer.mainContext)
         case .settings:
             SettingsView { buttons in
                 rightButtons = AnyView(buttons)

@@ -21,7 +21,6 @@ struct BookCollectionView: View {
     
     var updateRightButtons: (_ buttons: AnyView) -> Void
     var needToHideNavigation: (_ isHidden: Bool) -> Void
-    @State private var isSharing: Bool = false
     @StateObject private var shareManager = ShareManager()
     
     init(viewModel: BookCollectionViewModel, updateRightButtons: @escaping (_: AnyView) -> Void, needToHideNavigation: @escaping (_: Bool) -> Void) {

@@ -12,6 +12,32 @@ final class ShareManager: ObservableObject {
     @Published var shareItems: [Any] = []
     @Published var isSharePresented: Bool = false
     
+    func shareSavedBook(_ savedBook: SavedBooks) {
+        guard let url = URL(string: savedBook.storeLink) else { return }
+        let title = savedBook.title
+        let authors = savedBook.authors
+        let message = "Check out this book \"\(title)\" by \(authors)"
+        var items : [Any] = [url,message]
+        if let imageUrl = URL(string: savedBook.coverURL) {
+            URLSession.shared.dataTask(with: imageUrl) { data, _, _ in
+                if let data, let image = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        self.shareItems = [url,message,image]
+                        self.isSharePresented = true
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.shareItems = items
+                        self.isSharePresented = true
+                    }
+                }
+            }.resume()
+        } else {
+            shareItems = items
+            isSharePresented = true
+        }
+    }
+    
     func share(_ book: Book) {
         guard let url = URL(string: book.volumeInfo.canonicalVolumeLink) else { return }
         let title = book.volumeInfo.title

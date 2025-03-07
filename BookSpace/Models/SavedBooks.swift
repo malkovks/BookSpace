@@ -19,12 +19,14 @@ class SavedBooks {
     var language: String
     var publisher: String
     var publishedDate: String
+    var coverURL: String
     var pagesCount: Int
     var maturityRating: String
     var averageRating: Double?
     var ratingsCount: Double?
     var storeLink: String
     var marketLink: String
+    var createdAt: Date
     
     init(from book: Book) {
         self.id = book.id
@@ -41,5 +43,14 @@ class SavedBooks {
         self.ratingsCount = book.volumeInfo.ratingsCount
         self.storeLink = book.volumeInfo.canonicalVolumeLink
         self.marketLink = book.accessInfo.webReaderLink
+        self.coverURL = book.volumeInfo.imageLinks.thumbnail
+        self.createdAt = Self.currentDateInLocalTimeFormat()
+    }
+    
+    private static func currentDateInLocalTimeFormat() -> Date {
+        let now = Date()
+        let timeZone = TimeZone.current
+        let secondsFromGMT = timeZone.secondsFromGMT(for: now)
+        return now.addingTimeInterval(TimeInterval(secondsFromGMT))
     }
 }

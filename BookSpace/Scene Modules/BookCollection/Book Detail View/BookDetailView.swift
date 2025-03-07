@@ -26,14 +26,13 @@ struct BookDetailView: View {
     var isAddedToReadLater: ((_ isReadLater: Bool) -> Void)?
     
     @StateObject private var viewModel = BookDetailViewModel()
+    @StateObject private var shareManager = ShareManager()
     private var isFavoriteImageName: String {
         return isFavorite ? "heart.fill" : "heart"
     }
     private var isFutureReadingImageName: String {
         return isFutureReading ? "bookmark.fill" : "bookmark"
     }
-    
-    
     
     
     var body: some View {
@@ -47,16 +46,14 @@ struct BookDetailView: View {
                 })
                 
                 
-                .frame(height: 250)
+                .frame(height: 250,alignment: .center)
                 .clipShape(.rect(cornerRadius: 10))
                 .listRowBackground(Color.clear)
                 
-                Text(book.volumeInfo.description)
-                    .font(.system(.callout, design: .serif))
-                    .italic()
-                    .multilineTextAlignment(.center)
+                ExpandableText(text: book.volumeInfo.description)
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
+                    .frame(maxWidth: .infinity,alignment: .center)
                 Section {
                     DetailRow(title: "Name", value: book.volumeInfo.title)
                     DetailRow(title: "Authors", value: book.volumeInfo.authors.joined(separator: ", "))
@@ -93,9 +90,25 @@ struct BookDetailView: View {
                 
                 LinkRow(title: "Link in store", url: book.volumeInfo.canonicalVolumeLink, systemImage: "link")
                 LinkRow(title: "Link in Play Market", url: book.accessInfo.webReaderLink, systemImage: "storefront")
+                Button {
+                    shareManager.share(book)
+                } label: {
+                    HStack(alignment: .center) {
+                        Text("Share")
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    .frame(maxWidth: .infinity,alignment: .center)
+                }
+                .foregroundStyle(.black)
+                
+
                 
                 
             }
+            
+            .sheet(isPresented: $shareManager.isSharePresented, content: {
+                ShareSheet(items: shareManager.shareItems)
+            })
             .listStyle(.insetGrouped)
             .padding(.top,80)
             navigationView
