@@ -13,6 +13,7 @@ import SwiftData
 class SavedBooks {
     @Attribute(.unique) var id: String
     var title: String
+    var subtitle: String
     var _description: String
     var authors: String
     var category: String
@@ -27,10 +28,14 @@ class SavedBooks {
     var storeLink: String
     var marketLink: String
     var createdAt: Date
+    var isCompleteReaded: Bool = false
+    var isPlannedToRead: Bool = false
+    var isFavorite: Bool = false
     
-    init(from book: Book) {
+    init(from book: Book,isFavorite: Bool) {
         self.id = book.id
         self.title = book.volumeInfo.title
+        self.subtitle = book.volumeInfo.subtitle ?? ""
         self._description = book.volumeInfo.description
         self.authors = book.volumeInfo.authors.joined(separator: ", ")
         self.category = book.volumeInfo.categories.joined(separator: ", ")
@@ -46,6 +51,8 @@ class SavedBooks {
         self.coverURL = book.volumeInfo.imageLinks.thumbnail
         self.createdAt = Self.currentDateInLocalTimeFormat()
     }
+    
+    
     
     private static func currentDateInLocalTimeFormat() -> Date {
         let now = Date()

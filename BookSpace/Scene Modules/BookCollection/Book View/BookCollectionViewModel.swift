@@ -39,12 +39,6 @@ final class BookCollectionViewModel: ObservableObject {
 }
 
 extension BookCollectionViewModel {
-    func shareSelectedBook(_ book: Book){
-        print("Present UIActivityController for sharing item")
-    }
-}
-
-extension BookCollectionViewModel {
     
     func toggleFutureReading(book: Book){
         if isPlanned(book: book) {
@@ -94,8 +88,6 @@ extension BookCollectionViewModel {
             }
             objectWillChange.send()
         }
-        
-        
     }
 }
 
@@ -112,7 +104,7 @@ extension BookCollectionViewModel {
     func addToFavorites(book: Book) {
         guard !isFavorite(book: book) else { return }
         
-        let savedBook = SavedBooks(from: book)
+        let savedBook = SavedBooks(from: book, isFavorite: true)
         modelContext.insert(savedBook)
         
         do {

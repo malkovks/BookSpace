@@ -13,10 +13,13 @@ final class SavedBooksViewModel: ObservableObject {
     
     @Published var savedBooks: [SavedBooks] = []
     @Published var isModelsEmpty: Bool = false
+    @Published var isPresentAlert: Bool = false
+    @Published var deleteSelectedBook: SavedBooks?
+    @Published var selectedBook: SavedBooks?
+    @Published var navigationPath = NavigationPath()
     
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
-        fetchSavedBooks()
     }
 }
 
@@ -32,13 +35,34 @@ extension SavedBooksViewModel {
         }
     }
     
-    func remove(book: SavedBooks) {
-        modelContext.delete(book)
+    func remove() {
+        guard let deleteSelectedBook else { return }
+        modelContext.delete(deleteSelectedBook)
         do {
             try modelContext.save()
             fetchSavedBooks()
         } catch {
             print("Error delete book: \(error)")
+        }
+    }
+    
+    func updatePlannedRead(for book: SavedBooks, needToRead: Bool){
+        book.isPlannedToRead = needToRead
+        do {
+            try modelContext.save()
+            fetchSavedBooks()
+        } catch {
+            print("Error update read status: \(error)")
+        }
+    }
+    
+    func updateCompleteReading(for book: SavedBooks,_ isComplete: Bool) {
+        book.isCompleteReaded = isComplete
+        do {
+            try modelContext.save()
+            fetchSavedBooks()
+        } catch {
+            print("Error update read completing: \(error)")
         }
     }
     

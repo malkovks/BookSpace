@@ -25,6 +25,7 @@ struct AsyncImageView: View {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
+                    .foregroundStyle(.skyBlue)
                 
             } else {
                 Image(systemName: "photo")
@@ -32,7 +33,6 @@ struct AsyncImageView: View {
                     .scaledToFit()
                     .foregroundStyle(.gray)
             }
-//            loadedImage?(image)
         }
         .onAppear {
             loadImage()

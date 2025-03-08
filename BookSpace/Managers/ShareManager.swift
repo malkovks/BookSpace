@@ -17,7 +17,7 @@ final class ShareManager: ObservableObject {
         let title = savedBook.title
         let authors = savedBook.authors
         let message = "Check out this book \"\(title)\" by \(authors)"
-        var items : [Any] = [url,message]
+        let items : [Any] = [url,message]
         if let imageUrl = URL(string: savedBook.coverURL) {
             URLSession.shared.dataTask(with: imageUrl) { data, _, _ in
                 if let data, let image = UIImage(data: data) {
@@ -44,7 +44,7 @@ final class ShareManager: ObservableObject {
         let authors = book.volumeInfo.authors.joined(separator: ", ")
         let message = "Check out this book \"\(title)\" by \(authors)"
         
-        var items : [Any] = [url,message]
+        let items : [Any] = [url,message]
         let thumbnailString = book.volumeInfo.imageLinks.thumbnail
         if let imageUrl = URL(string: thumbnailString) {
             URLSession.shared.dataTask(with: imageUrl) { data, _, _ in
