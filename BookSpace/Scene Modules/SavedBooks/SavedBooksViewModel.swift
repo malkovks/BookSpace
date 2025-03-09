@@ -25,7 +25,10 @@ final class SavedBooksViewModel: ObservableObject {
 
 extension SavedBooksViewModel {
     func fetchSavedBooks() {
-        let descriptor = FetchDescriptor<SavedBooks>(sortBy: [SortDescriptor(\.createdAt,order: .reverse)])
+        var descriptor = FetchDescriptor<SavedBooks>(sortBy: [SortDescriptor(\.createdAt,order: .reverse)])
+        descriptor.predicate = #Predicate { savedBook in
+            savedBook.isFavorite == true
+        }
         if let books = try? modelContext.fetch(descriptor) {
             savedBooks = books
             isModelsEmpty = books.isEmpty

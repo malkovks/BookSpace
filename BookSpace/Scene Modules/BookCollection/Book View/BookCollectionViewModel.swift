@@ -39,105 +39,79 @@ final class BookCollectionViewModel: ObservableObject {
 }
 
 extension BookCollectionViewModel {
-    
-    func toggleFutureReading(book: Book){
-        if isPlanned(book: book) {
-            removeFromPlanning(book: book)
+
+    func updatePlannedBooks(_ book: Book,_ isReadLater: Bool? = nil){
+        
+        let descriptor = FetchDescriptor<SavedBooks>(predicate: #Predicate { savedBook in
+            savedBook.id == book.id
+        })
+        if let planned = try? modelContext.fetch(descriptor).first {
+            planned.isPlannedToRead = isReadLater ?? false
+            do {
+                try modelContext.save()
+                print("✅ Saved changes")
+            } catch {
+                print("Error updating data \(error)")
+            }
+            objectWillChange.send()
         } else {
-            addToPlanned(book: book)
+            let plannedBook = SavedBooks(from: book)
+            plannedBook.isPlannedToRead = true
+            modelContext.insert(plannedBook)
+            do {
+                try modelContext.save()
+                print("✅ Saved new model")
+            } catch {
+                print("Error updating data \(error)")
+            }
+            objectWillChange.send()
         }
     }
     
     func isPlanned(book: Book) -> Bool {
-        let descriptor = FetchDescriptor<PlannedBooks>(predicate: #Predicate { plannedBook in
-            plannedBook.id == book.id
+        let descriptor = FetchDescriptor<SavedBooks>(predicate: #Predicate { plannedBook in
+            plannedBook.id == book.id && plannedBook.isPlannedToRead
         })
         if let fav = try? modelContext.fetch(descriptor),
            let _ = fav.first { return true }
         return false
-    }
-    
-    func addToPlanned(book: Book) {
-        guard !isPlanned(book: book) else { return }
-        
-        let plannedBook = PlannedBooks(from: book)
-        modelContext.insert(plannedBook)
-        
-        do {
-            try modelContext.save()
-        } catch {
-            print("Error saving planned book: \(error)")
-        }
-        objectWillChange.send()
-    }
-    
-    func removeFromPlanning(book: Book) {
-        guard isPlanned(book: book) else { return }
-        
-        let descriptor = FetchDescriptor<PlannedBooks>(predicate: #Predicate { plannedBook in
-            plannedBook.id == book.id
-        })
-        
-        if let plannedBook = try? modelContext.fetch(descriptor).first {
-            modelContext.delete(plannedBook)
-            
-            do {
-                try modelContext.save()
-            } catch {
-                print("Error removing planned book: \(error)")
-            }
-            objectWillChange.send()
-        }
     }
 }
 
 extension BookCollectionViewModel {
     func isFavorite(book: Book) -> Bool {
         let descriptor = FetchDescriptor<SavedBooks>(predicate: #Predicate { savedBook in
-            savedBook.id == book.id
+            savedBook.id == book.id && savedBook.isFavorite
         })
         if let fav = try? modelContext.fetch(descriptor),
            let _ = fav.first { return true }
         return false
     }
     
-    func addToFavorites(book: Book) {
-        guard !isFavorite(book: book) else { return }
-        
-        let savedBook = SavedBooks(from: book, isFavorite: true)
-        modelContext.insert(savedBook)
-        
-        do {
-            try modelContext.save()
-        } catch {
-            print("Error saving favorite book: \(error)")
-        }
-        objectWillChange.send()
-    }
-    
-    func removeFromFavorite(book: Book) {
+    func updateFavoriteBooks(_ book: Book,_ isFav: Bool? = nil) {
         let descriptor = FetchDescriptor<SavedBooks>(predicate: #Predicate { savedBook in
             savedBook.id == book.id
         })
         if let fav = try? modelContext.fetch(descriptor).first {
-            modelContext.delete(fav)
-            
+            fav.isFavorite = isFav ?? !isFavorite(book: book)
             do {
                 try modelContext.save()
+                print("✅Update favorite books items")
             } catch {
-                print("Error Deleting favorite book: \(error)")
+                print("❗️Error saving updates for favorite books")
             }
             objectWillChange.send()
         } else {
-            print("Favorite book not found.")
-        }
-    }
-    
-    func toggleFavorite(book: Book) {
-        if isFavorite(book: book) {
-            removeFromFavorite(book: book)
-        } else {
-            addToFavorites(book: book)
+            let favBook = SavedBooks(from: book)
+            favBook.isFavorite = true
+            modelContext.insert(favBook)
+            do {
+                try modelContext.save()
+                print("✅Add favorite books items")
+            } catch {
+                print("❗️Error saving updates for favorite books")
+            }
+            objectWillChange.send()
         }
     }
 }
@@ -151,24 +125,24 @@ extension BookCollectionViewModel {
         errorMessage = nil
         
 
-//        do {
-//            //query request is default
-//            let response = try await api.fetchData(query: "mafia")
-//            books = response.items ?? []
-//            print("Fetched \(books.count) books.")
-//        } catch {
-//            errorMessage = error.localizedDescription
-//            print("Fetching failed: \(error)")
-//        }
-             
-         
         do {
-            
-            try await Task.sleep(nanoseconds: 2_000_000_000) // 2 sec test request
+            //query request is default
+            let response = try await api.fetchData(query: "mafia")
+            books = response.items ?? []
+            print("Fetched \(books.count) books.")
         } catch {
-            errorMessage = "Failed to simulate loading"
+            errorMessage = error.localizedDescription
+            print("Fetching failed: \(error)")
         }
-        books = bookMockModel
+             
+//         
+//        do {
+//            
+//            try await Task.sleep(nanoseconds: 2_000_000_000) // 2 sec test request
+//        } catch {
+//            errorMessage = "Failed to simulate loading"
+//        }
+//        books = bookMockModel
         
         isLoading = false
     }

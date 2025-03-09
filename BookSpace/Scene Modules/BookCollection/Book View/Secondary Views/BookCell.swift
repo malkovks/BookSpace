@@ -8,9 +8,9 @@
 import SwiftUI
 
 enum BookAction {
-    case favorite
+    case favorite(_ isFav: Bool)
     case share
-    case bookmark
+    case bookmark(_ isPlanned: Bool)
 }
 
 struct BookCell: View {
@@ -60,7 +60,7 @@ struct BookCell: View {
         .overlay(alignment: .topTrailing) {
             Menu {
                 Button {
-                    callMenu(.favorite)
+                    callMenu(.favorite(isFavorite))
                 } label: {
                     Label(isFavoriteText.0, systemImage: isFavoriteText.1)
                 }
@@ -72,7 +72,7 @@ struct BookCell: View {
                 }
                 
                 Button {
-                    callMenu(.bookmark)
+                    callMenu(.bookmark(isPlanned))
                 } label: {
                     Label(isPlannedRead.0, systemImage: isPlannedRead.1)
                 }

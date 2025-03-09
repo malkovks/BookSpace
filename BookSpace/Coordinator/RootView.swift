@@ -1,5 +1,5 @@
 //
-// File name: Untitled.swift
+// File name: RootView.swift
 // Package: BookSpace
 //
 // Created by Malkov Konstantin on 26.02.2025.
@@ -10,7 +10,7 @@ import SwiftData
 
 struct RootView: View {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([PlannedBooks.self,SavedBooks.self])
+        let schema = Schema([SavedBooks.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         return try! ModelContainer(for: schema, configurations: [modelConfiguration])
     }()
@@ -87,9 +87,11 @@ struct RootView: View {
             }
             
         case .readLater:
-            ReadLaterView { buttons in
-                rightButtons = AnyView(buttons)
-            }
+            ReadLaterView(viewModel: ReadLaterViewModel(modelContext: sharedModelContainer.mainContext), updateRightButtons: { buttons in
+                rightButtons = buttons
+            }, navigateToBookCollection: {
+                coordinator.selectedCategory = .main
+            })
             .modelContext(sharedModelContainer.mainContext)
         }
     }

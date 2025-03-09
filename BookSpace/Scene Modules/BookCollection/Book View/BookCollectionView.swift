@@ -38,9 +38,9 @@ struct BookCollectionView: View {
                             BookDetailView(book: bookWrapper.book, isFavorite: viewModel.isFavorite(book: bookWrapper.book), isFutureReading: viewModel.isPlanned(book: bookWrapper.book)) {
                                 viewModel.navigationPath.removeLast()
                             } isAddedToFavorite: { isFavorite in
-                                isFavorite ? viewModel.addToFavorites(book: bookWrapper.book) : viewModel.removeFromFavorite(book: bookWrapper.book)
+                                viewModel.updateFavoriteBooks(bookWrapper.book, isFavorite)
                             } isAddedToReadLater: { isReadLater in
-                                isReadLater ? viewModel.addToPlanned(book: bookWrapper.book) : viewModel.removeFromPlanning(book: bookWrapper.book)
+                                viewModel.updatePlannedBooks(bookWrapper.book, isReadLater)
                             }
                         }
                     
@@ -101,7 +101,7 @@ struct BookCollectionView: View {
         let plannedImg = isPlanned ? "bookmark.fill" : "bookmark"
         return Group {
             Button {
-                viewModel.toggleFavorite(book: book)
+                viewModel.updateFavoriteBooks(book)
             } label: {
                 Label(favoriteStatus, systemImage: favImg)
             }
@@ -113,7 +113,7 @@ struct BookCollectionView: View {
             }
 
             Button {
-                viewModel.toggleFutureReading(book: book)
+                viewModel.updatePlannedBooks(book)
             } label: {
                 Label(plannedStatus, systemImage: plannedImg)
             }
@@ -131,12 +131,12 @@ struct BookCollectionView: View {
                         BookCell(book: book,isFavorite: viewModel.isFavorite(book: book),isPlanned: viewModel.isPlanned(book: book)) { bookAction in
                             switch bookAction {
                                 
-                            case .favorite:
-                                viewModel.toggleFavorite(book: book)
+                            case .favorite(let favorite):
+                                viewModel.updateFavoriteBooks(book, favorite)
                             case .share:
                                 shareManager.share(book)
-                            case .bookmark:
-                                viewModel.toggleFutureReading(book: book)
+                            case .bookmark(let planned):
+                                viewModel.updatePlannedBooks(book,planned)
                             }
                         }
                         

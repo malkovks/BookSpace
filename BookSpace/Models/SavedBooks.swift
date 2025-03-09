@@ -10,7 +10,7 @@ import Foundation
 import SwiftData
 
 @Model
-class SavedBooks {
+class SavedBooks: ObservableObject {
     @Attribute(.unique) var id: String
     var title: String
     var subtitle: String
@@ -32,7 +32,7 @@ class SavedBooks {
     var isPlannedToRead: Bool = false
     var isFavorite: Bool = false
     
-    init(from book: Book,isFavorite: Bool) {
+    init(from book: Book) {
         self.id = book.id
         self.title = book.volumeInfo.title
         self.subtitle = book.volumeInfo.subtitle ?? ""

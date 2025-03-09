@@ -144,7 +144,7 @@ struct SavedBooksView: View {
 
 
 #Preview {
-    let book = SavedBooks(from: bookMockModel.first!, isFavorite: false)
+    let book = SavedBooks(from: bookMockModel.first!)
     SavedBookCell(book: book) { result in
     }
 }
