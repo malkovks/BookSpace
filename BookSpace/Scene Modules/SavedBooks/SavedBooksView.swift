@@ -74,7 +74,7 @@ struct SavedBooksView: View {
                 ForEach(viewModel.savedBooks,id: \.id) { book in
                     SavedBookCell(book: book) { result in
                         switch result {
-                        case .remove:
+                        case .isFavorite(let isFav):
                             viewModel.isPresentAlert = true
                             viewModel.deleteSelectedBook = book
                         case .share:
@@ -84,7 +84,7 @@ struct SavedBooksView: View {
                         case .updateRating(let rating):
                             viewModel.updateRating(for: book, rating: rating)
                         case .markAsReaded(let isComplete):
-                            viewModel.updateCompleteReading(for: book, isComplete)
+                            break
                         }
                     }
                     .frame(height: 200)
@@ -96,8 +96,6 @@ struct SavedBooksView: View {
                 }
             }
         }
-        .listRowSeparator(.hidden)
-        .listStyle(.inset)
         .refreshable {
             viewModel.fetchSavedBooks()
         }

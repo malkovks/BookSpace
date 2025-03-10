@@ -35,4 +35,34 @@ extension ReadLaterViewModel {
             isModelsEmpty = true
         }
     }
+    
+    func updateCompleteStatus(for book: SavedBooks,isComplete: Bool){
+        book.isCompleteReaded = isComplete
+        do {
+            try modelContext.save()
+            fetchReadLaterBooks()
+        } catch {
+            print("Error updating complete reader status: \(error)")
+        }
+    }
+    
+    func updatePlannedStatus(for book: SavedBooks,isPlanned: Bool){
+        book.isPlannedToRead = isPlanned
+        do {
+            try modelContext.save()
+            fetchReadLaterBooks()
+        } catch {
+            print("Error updating planned to read status: \(error)")
+        }
+    }
+    
+    func updateFavStatus(for book: SavedBooks, isFavorite: Bool) {
+        book.isFavorite = isFavorite
+        do {
+            try modelContext.save()
+            fetchReadLaterBooks()
+        } catch {
+            print("Error updating saved status: \(error)")
+        }
+    }
 }

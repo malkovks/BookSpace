@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum SavedBooksAction {
-    case remove
+    case isFavorite(_ isFavorite: Bool)
     case share
     case readLater(_ isPlanned: Bool)
     case updateRating(_ rating: Int)
@@ -26,8 +26,10 @@ struct SavedBookCell: View {
         self.isCompleted = book.isCompleteReaded
         self.isPlanned = book.isPlannedToRead
         self.buttonAction = buttonAction
+        self.isFav = book.isFavorite
     }
     
+    @State private var isFav: Bool
     @State private var isCompleted: Bool
     @State private var isPlanned: Bool
     @State private var scale: CGFloat = 1.0
@@ -89,9 +91,11 @@ struct SavedBookCell: View {
             }
 
             Button {
-                buttonAction(.remove)
+                isFav.toggle()
+                buttonAction(.isFavorite(isFav))
             } label: {
-                createImage("heart.fill",fontSize: 20)
+                let isFav = isFav ? "heart.fill" : "heart"
+                createImage(isFav,fontSize: 20)
             }
             
             Button {

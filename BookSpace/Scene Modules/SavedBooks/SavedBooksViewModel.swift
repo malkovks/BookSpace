@@ -59,16 +59,6 @@ extension SavedBooksViewModel {
         }
     }
     
-    func updateCompleteReading(for book: SavedBooks,_ isComplete: Bool) {
-        book.isCompleteReaded = isComplete
-        do {
-            try modelContext.save()
-            fetchSavedBooks()
-        } catch {
-            print("Error update read completing: \(error)")
-        }
-    }
-    
     func updateRating(for book: SavedBooks, rating: Int) {
         book.averageRating = Double(rating)
         do {
@@ -76,17 +66,6 @@ extension SavedBooksViewModel {
             fetchSavedBooks()
         } catch {
             print("Error update rating: \(error)")
-        }
-    }
-    
-    func isEmptySavedBooks() -> Bool {
-        let descriptor = FetchDescriptor<SavedBooks>()
-        do {
-            let books = try modelContext.fetch(descriptor)
-            return books.isEmpty
-        } catch {
-            print("Error fetching books: \(error)")
-            return true
         }
     }
 }

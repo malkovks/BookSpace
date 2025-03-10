@@ -30,6 +30,7 @@ struct BookCollectionView: View {
     }
 
     var body: some View {
+        //Не работает обновление избранного и будущего чтения одновременно для одной модели
         NavigationStack(path: $viewModel.navigationPath) {
             GeometryReader { geometry in
                 ZStack(alignment: .top) {
