@@ -9,60 +9,38 @@
 import SwiftUI
 import SwiftData
 
+@MainActor
 class ReadLaterViewModel: ObservableObject {
-    var modelContext: ModelContext
     
-    @Published var books: [SavedBooks] = []
+    private let dataManager: BooksDataManager
+    
+    @Published var books: [SavedBooks] = [] {
+        didSet {
+            isModelsEmpty = books.isEmpty
+        }
+    }
     @Published var isModelsEmpty: Bool = false
     
     init(modelContext: ModelContext) {
-        self.modelContext = modelContext
+        self.dataManager = BooksDataManager(context: modelContext)
     }
 }
 
 extension ReadLaterViewModel {
     
     func fetchReadLaterBooks() {
-        var descriptor = FetchDescriptor<SavedBooks>(sortBy: [SortDescriptor(\.createdAt, order: .reverse)])
-        descriptor.predicate = #Predicate { savedBook in
-            savedBook.isPlannedToRead
-        }
-        if let books = try? modelContext.fetch(descriptor) {
-            self.books = books
-            isModelsEmpty = books.isEmpty
-        } else {
-            self.books = []
-            isModelsEmpty = true
-        }
+        books = dataManager.fetchBooks().filter({ $0.isPlannedToRead })
     }
     
     func updateCompleteStatus(for book: SavedBooks,isComplete: Bool){
-        book.isCompleteReaded = isComplete
-        do {
-            try modelContext.save()
-            fetchReadLaterBooks()
-        } catch {
-            print("Error updating complete reader status: \(error)")
-        }
+        dataManager.toggleCompleteStatus(for: book, isComplete: isComplete)
     }
     
     func updatePlannedStatus(for book: SavedBooks,isPlanned: Bool){
-        book.isPlannedToRead = isPlanned
-        do {
-            try modelContext.save()
-            fetchReadLaterBooks()
-        } catch {
-            print("Error updating planned to read status: \(error)")
-        }
+        dataManager.togglePlannedToRead(for: book, isPlanned: isPlanned)
     }
     
     func updateFavStatus(for book: SavedBooks, isFavorite: Bool) {
-        book.isFavorite = isFavorite
-        do {
-            try modelContext.save()
-            fetchReadLaterBooks()
-        } catch {
-            print("Error updating saved status: \(error)")
-        }
+        dataManager.toggleFavorite(for: book, isFavorite: isFavorite)
     }
 }

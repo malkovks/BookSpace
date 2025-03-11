@@ -8,10 +8,15 @@
 import SwiftUI
 import SwiftData
 
+@MainActor
 final class SavedBooksViewModel: ObservableObject {
-    var modelContext: ModelContext
+    private let dataManager: BooksDataManager
     
-    @Published var savedBooks: [SavedBooks] = []
+    @Published var savedBooks: [SavedBooks] = [] {
+        didSet {
+            isModelsEmpty = savedBooks.isEmpty
+        }
+    }
     @Published var isModelsEmpty: Bool = false
     @Published var isPresentAlert: Bool = false
     @Published var deleteSelectedBook: SavedBooks?
@@ -19,53 +24,25 @@ final class SavedBooksViewModel: ObservableObject {
     @Published var navigationPath = NavigationPath()
     
     init(modelContext: ModelContext) {
-        self.modelContext = modelContext
+        self.dataManager = BooksDataManager(context: modelContext)
     }
 }
 
 extension SavedBooksViewModel {
     func fetchSavedBooks() {
-        var descriptor = FetchDescriptor<SavedBooks>(sortBy: [SortDescriptor(\.createdAt,order: .reverse)])
-        descriptor.predicate = #Predicate { savedBook in
-            savedBook.isFavorite == true
-        }
-        if let books = try? modelContext.fetch(descriptor) {
-            savedBooks = books
-            isModelsEmpty = books.isEmpty
-        } else {
-            savedBooks = []
-            isModelsEmpty = true
-        }
+        savedBooks = dataManager.fetchBooks().filter({ $0.isFavorite })
     }
     
     func remove() {
         guard let deleteSelectedBook else { return }
-        modelContext.delete(deleteSelectedBook)
-        do {
-            try modelContext.save()
-            fetchSavedBooks()
-        } catch {
-            print("Error delete book: \(error)")
-        }
+        dataManager.deleteFromStorage(book: deleteSelectedBook)
     }
     
     func updatePlannedRead(for book: SavedBooks, needToRead: Bool){
-        book.isPlannedToRead = needToRead
-        do {
-            try modelContext.save()
-            fetchSavedBooks()
-        } catch {
-            print("Error update read status: \(error)")
-        }
+        dataManager.togglePlannedToRead(for: book, isPlanned: needToRead)
     }
     
     func updateRating(for book: SavedBooks, rating: Int) {
-        book.averageRating = Double(rating)
-        do {
-            try modelContext.save()
-            fetchSavedBooks()
-        } catch {
-            print("Error update rating: \(error)")
-        }
+        dataManager.updateBookRating(for: book, rating: rating)
     }
 }

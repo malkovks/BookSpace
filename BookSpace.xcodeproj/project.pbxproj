@@ -6,7 +6,41 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		FD196BE12D8023A900EAF55A /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD196BBD2D80180000EAF55A /* WidgetKit.framework */; };
+		FD196BE22D8023A900EAF55A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD196BBF2D80180000EAF55A /* SwiftUI.framework */; };
+		FD196BF12D8023AA00EAF55A /* BooksWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FD196BE02D8023A900EAF55A /* BooksWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FD196BEF2D8023AA00EAF55A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FD2E6EE42D69B7AF00852B3C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FD196BDF2D8023A900EAF55A;
+			remoteInfo = BooksWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FD196BD62D80180100EAF55A /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				FD196BF12D8023AA00EAF55A /* BooksWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		FD196BBD2D80180000EAF55A /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		FD196BBF2D80180000EAF55A /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		FD196BE02D8023A900EAF55A /* BooksWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BooksWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		FD196C032D80324100EAF55A /* BooksWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BooksWidgetExtension.entitlements; sourceTree = "<group>"; };
 		FD2E6EEC2D69B7AF00852B3C /* BookSpace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BookSpace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -18,13 +52,40 @@
 			);
 			target = FD2E6EEB2D69B7AF00852B3C /* BookSpace */;
 		};
+		FD196BF52D8023AA00EAF55A /* Exceptions for "BooksWidget" folder in "BooksWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = FD196BDF2D8023A900EAF55A /* BooksWidgetExtension */;
+		};
+		FD196BF92D80241800EAF55A /* Exceptions for "BookSpace" folder in "BooksWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets.xcassets,
+				"Extensions/ModelContext+Extension.swift",
+				Managers/BooksDataManager.swift,
+				Models/Book.swift,
+				Models/SavedBooks.swift,
+			);
+			target = FD196BDF2D8023A900EAF55A /* BooksWidgetExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		FD196BE32D8023A900EAF55A /* BooksWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				FD196BF52D8023AA00EAF55A /* Exceptions for "BooksWidget" folder in "BooksWidgetExtension" target */,
+			);
+			path = BooksWidget;
+			sourceTree = "<group>";
+		};
 		FD2E6EEE2D69B7AF00852B3C /* BookSpace */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				FD1968FE2D745A5800EAF55A /* Exceptions for "BookSpace" folder in "BookSpace" target */,
+				FD196BF92D80241800EAF55A /* Exceptions for "BookSpace" folder in "BooksWidgetExtension" target */,
 			);
 			path = BookSpace;
 			sourceTree = "<group>";
@@ -32,6 +93,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		FD196BDD2D8023A900EAF55A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FD196BE22D8023A900EAF55A /* SwiftUI.framework in Frameworks */,
+				FD196BE12D8023A900EAF55A /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FD2E6EE92D69B7AF00852B3C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -42,10 +112,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		FD196BBC2D80180000EAF55A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FD196BBD2D80180000EAF55A /* WidgetKit.framework */,
+				FD196BBF2D80180000EAF55A /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		FD2E6EE32D69B7AF00852B3C = {
 			isa = PBXGroup;
 			children = (
+				FD196C032D80324100EAF55A /* BooksWidgetExtension.entitlements */,
 				FD2E6EEE2D69B7AF00852B3C /* BookSpace */,
+				FD196BE32D8023A900EAF55A /* BooksWidget */,
+				FD196BBC2D80180000EAF55A /* Frameworks */,
 				FD2E6EED2D69B7AF00852B3C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,6 +136,7 @@
 			isa = PBXGroup;
 			children = (
 				FD2E6EEC2D69B7AF00852B3C /* BookSpace.app */,
+				FD196BE02D8023A900EAF55A /* BooksWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -61,6 +144,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		FD196BDF2D8023A900EAF55A /* BooksWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FD196BF22D8023AA00EAF55A /* Build configuration list for PBXNativeTarget "BooksWidgetExtension" */;
+			buildPhases = (
+				FD196BDC2D8023A900EAF55A /* Sources */,
+				FD196BDD2D8023A900EAF55A /* Frameworks */,
+				FD196BDE2D8023A900EAF55A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				FD196BE32D8023A900EAF55A /* BooksWidget */,
+			);
+			name = BooksWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = BooksWidgetExtension;
+			productReference = FD196BE02D8023A900EAF55A /* BooksWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		FD2E6EEB2D69B7AF00852B3C /* BookSpace */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FD2E6EFC2D69B7B000852B3C /* Build configuration list for PBXNativeTarget "BookSpace" */;
@@ -68,10 +173,12 @@
 				FD2E6EE82D69B7AF00852B3C /* Sources */,
 				FD2E6EE92D69B7AF00852B3C /* Frameworks */,
 				FD2E6EEA2D69B7AF00852B3C /* Resources */,
+				FD196BD62D80180100EAF55A /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				FD196BF02D8023AA00EAF55A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				FD2E6EEE2D69B7AF00852B3C /* BookSpace */,
@@ -93,6 +200,9 @@
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
+					FD196BDF2D8023A900EAF55A = {
+						CreatedOnToolsVersion = 16.0;
+					};
 					FD2E6EEB2D69B7AF00852B3C = {
 						CreatedOnToolsVersion = 16.0;
 					};
@@ -113,11 +223,19 @@
 			projectRoot = "";
 			targets = (
 				FD2E6EEB2D69B7AF00852B3C /* BookSpace */,
+				FD196BDF2D8023A900EAF55A /* BooksWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		FD196BDE2D8023A900EAF55A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FD2E6EEA2D69B7AF00852B3C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -128,6 +246,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		FD196BDC2D8023A900EAF55A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FD2E6EE82D69B7AF00852B3C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -137,7 +262,79 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		FD196BF02D8023AA00EAF55A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FD196BDF2D8023A900EAF55A /* BooksWidgetExtension */;
+			targetProxy = FD196BEF2D8023AA00EAF55A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		FD196BF32D8023AA00EAF55A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = BooksWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9W7A46LJ9H;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BooksWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BooksWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = malkov.ks.BookSpace.BooksWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		FD196BF42D8023AA00EAF55A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = BooksWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9W7A46LJ9H;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BooksWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BooksWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = malkov.ks.BookSpace.BooksWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 		FD2E6EFA2D69B7B000852B3C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -262,6 +459,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = BookSpace/BookSpace.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"BookSpace/Preview Content\"";
@@ -296,6 +494,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = BookSpace/BookSpace.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"BookSpace/Preview Content\"";
@@ -328,6 +527,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		FD196BF22D8023AA00EAF55A /* Build configuration list for PBXNativeTarget "BooksWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FD196BF32D8023AA00EAF55A /* Debug */,
+				FD196BF42D8023AA00EAF55A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		FD2E6EE72D69B7AF00852B3C /* Build configuration list for PBXProject "BookSpace" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

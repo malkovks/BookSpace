@@ -74,7 +74,7 @@ struct SavedBooksView: View {
                 ForEach(viewModel.savedBooks,id: \.id) { book in
                     SavedBookCell(book: book) { result in
                         switch result {
-                        case .isFavorite(let isFav):
+                        case .isFavorite:
                             viewModel.isPresentAlert = true
                             viewModel.deleteSelectedBook = book
                         case .share:
