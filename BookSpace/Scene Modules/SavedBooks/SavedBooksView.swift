@@ -83,7 +83,9 @@ struct SavedBooksView: View {
                             viewModel.updatePlannedRead(for: book, needToRead: isPlanned)
                         case .updateRating(let rating):
                             viewModel.updateRating(for: book, rating: rating)
-                        case .markAsReaded(let isComplete):
+                        case .markAsReaded(_):
+                            break
+                        case .selectedBook(_):
                             break
                         }
                     }

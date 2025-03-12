@@ -30,7 +30,6 @@ struct BookCollectionView: View {
     }
 
     var body: some View {
-        //Не работает обновление избранного и будущего чтения одновременно для одной модели
         NavigationStack(path: $viewModel.navigationPath) {
             GeometryReader { geometry in
                 ZStack(alignment: .top) {
@@ -90,6 +89,8 @@ struct BookCollectionView: View {
     private func errorMessageView(_ message: String) -> some View {
         return Text(message)
             .foregroundColor(.red)
+            .font(.largeTitle)
+            .minimumScaleFactor(0.5)
             .padding()
     }
     
@@ -102,7 +103,7 @@ struct BookCollectionView: View {
         let plannedImg = isPlanned ? "bookmark.fill" : "bookmark"
         return Group {
             Button {
-                viewModel.updateFavoriteBooks(book)
+                viewModel.updateFavoriteBooks(book,!isFav)
             } label: {
                 Label(favoriteStatus, systemImage: favImg)
             }
@@ -114,7 +115,7 @@ struct BookCollectionView: View {
             }
 
             Button {
-                viewModel.updatePlannedBooks(book)
+                viewModel.updatePlannedBooks(book,!isPlanned)
             } label: {
                 Label(plannedStatus, systemImage: plannedImg)
             }
@@ -131,7 +132,6 @@ struct BookCollectionView: View {
                     ForEach(viewModel.books, id: \.id) { book in
                         BookCell(book: book,isFavorite: viewModel.isFavorite(book: book),isPlanned: viewModel.isPlanned(book: book)) { bookAction in
                             switch bookAction {
-                                
                             case .favorite(let favorite):
                                 viewModel.updateFavoriteBooks(book, favorite)
                             case .share:

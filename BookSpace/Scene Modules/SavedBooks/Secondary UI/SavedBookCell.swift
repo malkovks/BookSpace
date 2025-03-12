@@ -13,6 +13,7 @@ enum SavedBooksAction {
     case readLater(_ isPlanned: Bool)
     case updateRating(_ rating: Int)
     case markAsReaded(_ isComplete: Bool)
+    case selectedBook(_ isSelected: Bool)
 }
 
 struct SavedBookCell: View {

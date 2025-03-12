@@ -14,12 +14,17 @@ struct DetailRow: View {
     var body: some View {
         HStack {
             Text(title)
-                .foregroundStyle(.gray)
+                .foregroundStyle(.secondary)
+                .font(.system(.headline,design: .rounded))
+                .minimumScaleFactor(0.8)
             Spacer()
             Text(value)
+                .foregroundStyle(.black)
+                .minimumScaleFactor(0.5)
                 .fontDesign(.monospaced)
                 .foregroundStyle(.primary)
                 .multilineTextAlignment(.trailing)
         }
     }
 }
+

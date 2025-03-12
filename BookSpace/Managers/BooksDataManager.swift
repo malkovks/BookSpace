@@ -46,37 +46,14 @@ class BooksDataManager {
         saveChanges()
     }
     
-    //check boolean flag for Book Collection view
-    func isBookPlanned(book: Book) -> Bool {
-        let descriptor = FetchDescriptor<SavedBooks>(predicate: #Predicate { plannedBook in
-            plannedBook.id == book.id && plannedBook.isPlannedToRead
-        })
-        if let planned = try? context.fetch(descriptor),
-           let _ = planned.first {
-            return true
-        }
-        return false
-    }
-    
-    func isBookFavorite(book: Book) -> Bool {
-        let descriptor = FetchDescriptor<SavedBooks>(predicate: #Predicate { favBook in
-            favBook.id == book.id && favBook.isFavorite
-        })
-        if let fav = try? context.fetch(descriptor),
-           let _ = fav.first {
-            return true
-        }
-        return false
-    }
-    
     //update statuses for books
-    func updatePlannedBooks(_ book: Book,_ isReadLater: Bool? = nil) {
+    func updatePlannedBooks(_ book: Book,_ isReadLater: Bool) {
         let descriptor = FetchDescriptor<SavedBooks>(predicate: #Predicate { plannedBooks in
             plannedBooks.id == book.id
         })
         do {
             if let planned = try context.fetch(descriptor).first {
-                let newStatus = isReadLater ?? false
+                let newStatus = !isReadLater
                 if planned.isPlannedToRead != newStatus {
                     planned.isPlannedToRead = newStatus
                     updateWidgetData()
@@ -89,19 +66,20 @@ class BooksDataManager {
                 plannedBook.isPlannedToRead = true
                 context.insert(plannedBook)
                 saveChanges()
+                print("✅Create new favorite book")
             }
         } catch {
             print("❌Error updating planned books: \(error)")
         }
     }
     
-    func updateFavoriteBooks(_ book: Book, _ isFavorite: Bool? = nil) {
+    func updateFavoriteBooks(_ book: Book, _ isFavorite: Bool) {
         let descriptor = FetchDescriptor<SavedBooks>(predicate: #Predicate { favBooks in
             favBooks.id == book.id
         })
         do {
             if let fav = try context.fetch(descriptor).first {
-                let newStatus = isFavorite ?? false
+                let newStatus = !isFavorite
                 if fav.isFavorite != newStatus {
                     fav.isFavorite = newStatus
                     updateWidgetData()
@@ -114,11 +92,14 @@ class BooksDataManager {
                 favBook.isFavorite = true
                 context.insert(favBook)
                 saveChanges()
+                print("✅Create new favorite book")
             }
         } catch {
             print("❌Error updating planned books: \(error)")
         }
     }
+}
+private extension BooksDataManager {
     
     private func saveChanges() {
         try? context.save()

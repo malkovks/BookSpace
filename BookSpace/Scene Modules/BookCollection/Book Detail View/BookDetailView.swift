@@ -57,7 +57,7 @@ struct BookDetailView: View {
                 Section {
                     DetailRow(title: "Name", value: book.volumeInfo.title)
                     DetailRow(title: "Authors", value: book.volumeInfo.authors.joined(separator: ", "))
-                    DetailRow(title: "Category", value: book.volumeInfo.categories.joined(separator: ", "))
+                    DetailRow(title: "Category", value: book.volumeInfo.categories?.joined(separator: ", ") ?? "")
                     DetailRow(title: "Language", value: book.volumeInfo.language.capitalized)
                 } header: {
                     Text("Main info")
@@ -66,7 +66,7 @@ struct BookDetailView: View {
                 
                 Section {
                     DetailRow(title: "Publisher", value: book.volumeInfo.publisher)
-                    DetailRow(title: "Published Date", value: book.volumeInfo.publishedDate)
+                    DetailRow(title: "Published Date", value: book.volumeInfo.publishedDate ?? "")
                     DetailRow(title: "Pages count", value: "\(book.volumeInfo.pageCount)")
                 } header: {
                     Text("Additional info")

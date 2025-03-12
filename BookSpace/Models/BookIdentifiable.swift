@@ -23,7 +23,7 @@ struct BookIdentifiable: Hashable {
 
 extension Book {
     init(_ book: SavedBooks) {
-        let volume = Book.VolumeInfo(title: book.title, subtitle: book.subtitle, authors: [book.authors], publisher: book.publisher, publishedDate: book.publishedDate, description: book._description, pageCount: book.pagesCount, printType: "", categories: [book.category], averageRating: book.averageRating, ratingsCount: book.ratingsCount, maturityRating: book.maturityRating, allowAnonLogging: false, contentVersion: "", imageLinks: Book.VolumeInfo.ImageLinks.init(smallThumbnail: "", thumbnail: book.coverURL), language: book.language, previewLink: "", infoLink: "", canonicalVolumeLink: book.storeLink)
+        let volume = Book.VolumeInfo(title: book.title, subtitle: book.subtitle, authors: [book.authors], publisher: book.publisher, description: book._description, publishedDate: book.publishedDate, pageCount: book.pagesCount, printType: "", categories: [book.category], averageRating: book.averageRating, ratingsCount: book.ratingsCount, maturityRating: book.maturityRating, allowAnonLogging: false, contentVersion: "", imageLinks: Book.VolumeInfo.ImageLinks.init(smallThumbnail: "", thumbnail: book.coverURL), language: book.language, previewLink: "", infoLink: "", canonicalVolumeLink: book.storeLink)
         self.kind = ""
         self.etag = ""
         self.volumeInfo = volume

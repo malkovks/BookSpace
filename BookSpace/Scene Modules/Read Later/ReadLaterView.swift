@@ -27,7 +27,7 @@ struct ReadLaterView: View {
                 List {
                     ForEach(viewModel.books, id: \.id) { book in
                         Section {
-                            ReadLaterCell(book: book) { actions in
+                            ReadLaterCell(book: book, isEditing: $viewModel.isEditing) { actions in
                                 switch actions {
                                 case .isFavorite(let isFavorite):
                                     viewModel.updateFavStatus(for: book, isFavorite: isFavorite)
@@ -39,6 +39,12 @@ struct ReadLaterView: View {
                                     break
                                 case .markAsReaded(let complete):
                                     viewModel.updateCompleteStatus(for: book, isComplete: complete)
+                                case .selectedBook(let isSelected):
+                                    if isSelected {
+                                        viewModel.selectedItems.insert(book)
+                                    } else {
+                                        viewModel.selectedItems.remove(book)
+                                    }
                                 }
                             }
                             .listRowBackground(Color.skyBlue)
@@ -63,21 +69,31 @@ struct ReadLaterView: View {
             .sheet(isPresented: $shareManager.isSharePresented) {
                 ShareSheet(items: shareManager.shareItems)
             }
+            .alert(isPresented: $viewModel.isStartToDelete) {
+                Alert(
+                    title: Text("Are you sure you want to delete selected items?"),
+                    primaryButton: .destructive(Text("Delete"), action: {
+                        viewModel.deleteSelectedBooks()
+                    }),
+                    secondaryButton: .cancel())
+            }
         }
     }
     
     private var navigationButtons: some View {
         HStack {
             Button {
-                print("Open filter view")
+                viewModel.isEditing.toggle()
             } label: {
-                createImage("line.3.horizontal.decrease")
+                Label("Edit", image: "rectangle.and.pencil.and.ellipsis")
             }
             
-            Button {
-                print("Delete all books")
-            } label: {
-                createImage("trash",primaryColor: .red)
+            if viewModel.isEditing && !viewModel.selectedItems.isEmpty {
+                Button {
+                    viewModel.isStartToDelete.toggle()
+                } label: {
+                    createImage("trash",primaryColor: .red)
+                }
             }
         }
     }
@@ -86,16 +102,18 @@ struct ReadLaterView: View {
 
 struct ReadLaterCell: View {
     let book: SavedBooks
+    @Binding var isEditing: Bool
     let buttonActions: (_ actions: SavedBooksAction) -> Void?
     
-    init(book: SavedBooks, buttonActions: @escaping (_ actions: SavedBooksAction) -> Void?) {
+    init(book: SavedBooks,isEditing: Binding<Bool>, buttonActions: @escaping (_ actions: SavedBooksAction) -> Void?) {
         self.book = book
+        self._isEditing = isEditing
         self.buttonActions = buttonActions
         self.isFavorite = book.isFavorite
         self.isPlanned = book.isPlannedToRead
         self.isCompleteRead = book.isCompleteReaded
     }
-    
+    @State private var isModelSelected = false
     @State private var isCompleteRead: Bool
     @State private var isPlanned: Bool
     @State private var isFavorite: Bool
@@ -107,6 +125,8 @@ struct ReadLaterCell: View {
                 .padding([.vertical], 10)
                 .padding(.leading,isCompleteRead ? 40 : 10)
                 .animation(.easeIn(duration: 0.5), value: isCompleteRead)
+                .opacity(isEditing ? 0 : 1)
+                .animation(.easeInOut(duration: 0.5), value: isEditing)
             VStack(alignment: .leading) {
                 Text(book.title)
                     .font(.headline)
@@ -117,24 +137,40 @@ struct ReadLaterCell: View {
                     .frame(alignment: .leading)
             }
             Spacer(minLength: 10)
-            menuView
+            if isEditing {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        isModelSelected.toggle()
+                        buttonActions(.selectedBook(isModelSelected))
+                    }
+                } label: {
+                    createImage("circle")
+                }
+
+            } else {
+                menuView
+                    .transition(.move(edge: .trailing))
+            }
         }
         .overlay(alignment: .topLeading) {
-            if isCompleteRead {
+            if isCompleteRead && !isEditing{
                 withAnimation(.easeIn(duration: 0.5)) {
                     createImage("checkmark.circle.fill",fontSize: 18,primaryColor: .white,secondaryColor: .black)
                         .padding([.top,.leading], 5)
+                        .transition(.scale.combined(with: .opacity))
                 }
             }
         }
         .frame(maxWidth: .infinity)
         .frame(height: 80)
-        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+        .swipeActions(edge: .leading, allowsFullSwipe: false) {
             Button {
-                buttonActions(.markAsReaded(!isCompleteRead))
+                isCompleteRead.toggle()
+                buttonActions(.markAsReaded(isCompleteRead))
             } label: {
                 Label(isCompleteRead ? "Mark as unread" : "Mark as read", systemImage: isCompleteRead ? "checkmark.circle.fill" : "checkmark.circle")
             }
+            .tint(isCompleteRead ?  .gray : .green)
         }
     }
     
@@ -180,9 +216,9 @@ struct ReadLaterCell: View {
 }
 
 #Preview {
-    ReadLaterCell(book: SavedBooks(from: bookMockModel.first!)) { actions in
+    ReadLaterCell(book: SavedBooks(from: bookMockModel.first!), isEditing: .constant(false)) { actions in
         switch actions {
-        case .isFavorite(_):
+        case .isFavorite(let favorite):
             break
         case .share:
             break
@@ -191,6 +227,8 @@ struct ReadLaterCell: View {
         case .updateRating(_):
             break
         case .markAsReaded(_):
+            break
+        case .selectedBook(_):
             break
         }
     }

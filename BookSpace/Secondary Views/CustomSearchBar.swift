@@ -50,6 +50,7 @@ struct CustomSearchBar: View {
                 
                 listView
             }
+            .frame(maxHeight: .infinity)
             .background(.thickMaterial, in: .rect(cornerRadius: 16))
         }
     }
@@ -68,6 +69,7 @@ struct CustomSearchBar: View {
             }
             .listRowBackground(Color.paperYellow)
         }
+        .scrollDismissesKeyboard(.interactively)
         .scrollContentBackground(.hidden)
         .foregroundStyle(.black)
         .listStyle(.insetGrouped)
@@ -91,11 +93,11 @@ struct CustomSearchBar: View {
                 createImage("xmark",fontSize: 18)
             }
             .padding(10)
-            .opacity(isFocusedField ? 1 : 0)
         }
         .toolbar {
-            ToolbarItem(placement: .keyboard) {
+            ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
+                
                 Button("Done") {
                     isFocusedField = false
                 }

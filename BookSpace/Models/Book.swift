@@ -40,10 +40,11 @@ struct Book: Codable {
         let title: String
         let subtitle: String?
         let authors: [String]
-        let publisher, publishedDate, description: String
+        let publisher, description: String
+        let publishedDate: String?
         let pageCount: Int
         let printType: String
-        let categories: [String]
+        let categories: [String]?
         let averageRating, ratingsCount: Double?
         let maturityRating: String
         let allowAnonLogging: Bool

@@ -19,7 +19,10 @@ class ReadLaterViewModel: ObservableObject {
             isModelsEmpty = books.isEmpty
         }
     }
+    @Published var isEditing: Bool = false
     @Published var isModelsEmpty: Bool = false
+    @Published var isStartToDelete: Bool = false
+    @Published var selectedItems: Set<SavedBooks> = []
     
     init(modelContext: ModelContext) {
         self.dataManager = BooksDataManager(context: modelContext)
@@ -27,6 +30,12 @@ class ReadLaterViewModel: ObservableObject {
 }
 
 extension ReadLaterViewModel {
+    
+    func deleteSelectedBooks() {
+        for book in selectedItems {
+            dataManager.deleteFromStorage(book: book)
+        }
+    }
     
     func fetchReadLaterBooks() {
         books = dataManager.fetchBooks().filter({ $0.isPlannedToRead })
