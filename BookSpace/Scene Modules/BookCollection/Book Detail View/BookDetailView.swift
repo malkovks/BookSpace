@@ -36,18 +36,20 @@ struct BookDetailView: View {
     
     
     var body: some View {
-        ZStack(alignment: .topLeading) {
+        ZStack(alignment: .top) {
             viewModel.backgroundColor
                 .ignoresSafeArea()
             List {
-                AsyncImageView(url: book.volumeInfo.imageLinks.thumbnail,loadedImage: { image in
-                    let image = Image(uiImage: image)
-                    viewModel.extractColor(from: image)
-                })
+                HStack {
+                    AsyncImageView(url: book.volumeInfo.imageLinks.thumbnail,loadedImage: { image in
+                        let image = Image(uiImage: image)
+                        viewModel.extractColor(from: image)
+                    })
+                    .frame(height: 250,alignment: .center)
+                    .clipShape(.rect(cornerRadius: 10))
+                }
+                .frame(alignment: .center)
                 
-                
-                .frame(height: 250,alignment: .center)
-                .clipShape(.rect(cornerRadius: 10))
                 .listRowBackground(Color.clear)
                 
                 ExpandableText(text: book.volumeInfo.description)

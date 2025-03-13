@@ -14,4 +14,15 @@ extension View {
         let link = book.volumeInfo.canonicalVolumeLink
         return "Check out this book \"\(title)\" by \(author). You can read it here: \(link)"
     }
+    
+    @ViewBuilder
+    func isHidden(_ isHidden: Bool) -> some View {
+        if isHidden {
+            self.hidden()
+        } else {
+            self
+        }
+    }
 }
+
+
