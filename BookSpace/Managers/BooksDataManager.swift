@@ -47,7 +47,7 @@ class BooksDataManager {
     }
     
     //update statuses for books
-    func updatePlannedBooks(_ book: Book,_ isReadLater: Bool) {
+    func updatePlannedBooks(_ book: Book,_ isReadLater: Bool, completion: ((_ result: Status) -> Void)? = nil) {
         let descriptor = FetchDescriptor<SavedBooks>(predicate: #Predicate { plannedBooks in
             plannedBooks.id == book.id
         })
@@ -57,8 +57,10 @@ class BooksDataManager {
                 if planned.isPlannedToRead != newStatus {
                     planned.isPlannedToRead = newStatus
                     updateWidgetData()
+                    completion?(.update)
                     print("✅Update existed planned book status updated for \(planned.title)")
                 } else {
+                    completion?(.warning)
                     print("ℹ️ status is equal as stored property for \(planned.title)")
                 }
             } else {
@@ -66,14 +68,16 @@ class BooksDataManager {
                 plannedBook.isPlannedToRead = true
                 context.insert(plannedBook)
                 saveChanges()
+                completion?(.success)
                 print("✅Create new favorite book")
             }
         } catch {
+            completion?(.error)
             print("❌Error updating planned books: \(error)")
         }
     }
     
-    func updateFavoriteBooks(_ book: Book, _ isFavorite: Bool) {
+    func updateFavoriteBooks(_ book: Book, _ isFavorite: Bool, completion: ((_ result: Status) -> Void)? = nil) {
         let descriptor = FetchDescriptor<SavedBooks>(predicate: #Predicate { favBooks in
             favBooks.id == book.id
         })
@@ -83,8 +87,10 @@ class BooksDataManager {
                 if fav.isFavorite != newStatus {
                     fav.isFavorite = newStatus
                     updateWidgetData()
+                    completion?(.update)
                     print("✅Update existed planned book status updated for \(fav.title)")
                 } else {
+                    completion?(.warning)
                     print("ℹ️ status is equal as stored property for \(fav.title)")
                 }
             } else {
@@ -92,9 +98,11 @@ class BooksDataManager {
                 favBook.isFavorite = true
                 context.insert(favBook)
                 saveChanges()
+                completion?(.success)
                 print("✅Create new favorite book")
             }
         } catch {
+            completion?(.error)
             print("❌Error updating planned books: \(error)")
         }
     }

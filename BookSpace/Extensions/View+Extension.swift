@@ -10,7 +10,7 @@ import SwiftUI
 extension View {
     func messageBook(_ book: Book) -> String {
         let title = book.volumeInfo.title
-        let author = book.volumeInfo.authors.joined(separator: ", ")
+        let author = book.volumeInfo.authors?.joined(separator: ", ") ?? ""
         let link = book.volumeInfo.canonicalVolumeLink
         return "Check out this book \"\(title)\" by \(author). You can read it here: \(link)"
     }

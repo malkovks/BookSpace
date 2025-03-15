@@ -41,8 +41,8 @@ final class ShareManager: ObservableObject {
     func share(_ book: Book) {
         guard let url = URL(string: book.volumeInfo.canonicalVolumeLink) else { return }
         let title = book.volumeInfo.title
-        let authors = book.volumeInfo.authors.joined(separator: ", ")
-        let message = "Check out this book \"\(title)\" by \(authors)"
+        let authors = book.volumeInfo.authors?.joined(separator: ", ")
+        let message = "Check out this book \"\(title)\" by \(authors ?? "Unknown")"
         
         let items : [Any] = [url,message]
         let thumbnailString = book.volumeInfo.imageLinks.thumbnail

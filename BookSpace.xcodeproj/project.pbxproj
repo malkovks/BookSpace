@@ -64,9 +64,11 @@
 			membershipExceptions = (
 				Assets.xcassets,
 				"Extensions/ModelContext+Extension.swift",
+				Handlers/Status.swift,
 				Managers/BooksDataManager.swift,
 				Models/Book.swift,
 				Models/SavedBooks.swift,
+				"Secondary Views/StatusNotificationView.swift",
 			);
 			target = FD196BDF2D8023A900EAF55A /* BooksWidgetExtension */;
 		};

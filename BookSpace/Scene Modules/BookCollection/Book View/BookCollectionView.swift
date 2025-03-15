@@ -73,6 +73,7 @@ struct BookCollectionView: View {
                 .sheet(isPresented: $shareManager.isSharePresented) {
                     ShareSheet(items: shareManager.shareItems)
                 }
+                .statusNotification(isPresented: $viewModel.showAlertView, type: viewModel.status,message: viewModel.message, duration: 3.0)
             }
         }
     }
@@ -82,6 +83,7 @@ struct BookCollectionView: View {
             viewModel.isFilterOpened.toggle()
         }
         .frame(width: geometry.size.width / 2, height: geometry.size.height/3)
+        .frame(minHeight: geometry.size.height/3, maxHeight: geometry.size.height/2)
         .position(x: geometry.size.width - geometry.size.width / 3, y: geometry.size.height/3)
         .transition(.move(edge: .trailing))
     }
@@ -103,7 +105,12 @@ struct BookCollectionView: View {
         let plannedImg = isPlanned ? "bookmark.fill" : "bookmark"
         return Group {
             Button {
-                viewModel.updateFavoriteBooks(book,!isFav)
+                viewModel.updateFavoriteBooks(book,isFav) { result in
+                    displayMessage(isFav,type: .favorite)
+                    viewModel.status = result
+                    viewModel.showAlertView = true
+                    
+                }
             } label: {
                 Label(favoriteStatus, systemImage: favImg)
             }
@@ -115,7 +122,12 @@ struct BookCollectionView: View {
             }
 
             Button {
-                viewModel.updatePlannedBooks(book,!isPlanned)
+                viewModel.updatePlannedBooks(book,isPlanned) { result in
+                    displayMessage(isPlanned,type: .planned)
+                    viewModel.status = result
+                    viewModel.showAlertView = true
+                    
+                }
             } label: {
                 Label(plannedStatus, systemImage: plannedImg)
             }
@@ -133,11 +145,21 @@ struct BookCollectionView: View {
                         BookCell(book: book,isFavorite: viewModel.isFavorite(book: book),isPlanned: viewModel.isPlanned(book: book)) { bookAction in
                             switch bookAction {
                             case .favorite(let favorite):
-                                viewModel.updateFavoriteBooks(book, favorite)
+                                viewModel.updateFavoriteBooks(book, favorite) { result in
+                                    displayMessage(favorite, type: .favorite)
+                                    viewModel.showAlertView = true
+                                    viewModel.status = result
+                                    
+                                }
                             case .share:
                                 shareManager.share(book)
                             case .bookmark(let planned):
-                                viewModel.updatePlannedBooks(book,planned)
+                                viewModel.updatePlannedBooks(book,planned) { result in
+                                    displayMessage(planned,type: .planned)
+                                    viewModel.showAlertView = true
+                                    viewModel.status = result
+                                    
+                                }
                             }
                         }
                         
@@ -159,6 +181,18 @@ struct BookCollectionView: View {
             .padding(.horizontal,10)
             .opacity(viewModel.isLoading ? 0 : 1)
         }
+    }
+    
+    private func displayMessage(_ result: Bool, type: ValueType) {
+        switch type {
+        case .favorite:
+            let text = !result ? "Book added to favorites" : "Book removed from favorites"
+            viewModel.message = text
+        case .planned:
+            let text = !result ? "Book added to planned reading" : "Book removed from planned reading"
+            viewModel.message = text
+        }
+        
     }
     
     private var progressView: some View {

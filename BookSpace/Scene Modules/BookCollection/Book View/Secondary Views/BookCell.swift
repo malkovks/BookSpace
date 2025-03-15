@@ -52,7 +52,7 @@ struct BookCell: View {
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 5)
-                Text(book.volumeInfo.authors.joined(separator: ", "))
+                Text(book.volumeInfo.authors?.joined(separator: ", ") ?? "")
                     .font(.subheadline)
                     .fontDesign(.monospaced)
                     .lineLimit(2)

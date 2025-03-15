@@ -39,8 +39,9 @@ struct Book: Codable {
     struct VolumeInfo: Codable {
         let title: String
         let subtitle: String?
-        let authors: [String]
-        let publisher, description: String
+        let authors: [String]?
+        let publisher: String?
+        let description: String?
         let publishedDate: String?
         let pageCount: Int
         let printType: String

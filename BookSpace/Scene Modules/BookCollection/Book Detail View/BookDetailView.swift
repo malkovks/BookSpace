@@ -48,17 +48,17 @@ struct BookDetailView: View {
                     .frame(height: 250,alignment: .center)
                     .clipShape(.rect(cornerRadius: 10))
                 }
-                .frame(alignment: .center)
+                .frame(maxWidth: .infinity,alignment: .center)
                 
                 .listRowBackground(Color.clear)
                 
-                ExpandableText(text: book.volumeInfo.description)
+                ExpandableText(text: book.volumeInfo.description  ?? "")
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
                     .frame(maxWidth: .infinity,alignment: .center)
                 Section {
                     DetailRow(title: "Name", value: book.volumeInfo.title)
-                    DetailRow(title: "Authors", value: book.volumeInfo.authors.joined(separator: ", "))
+                    DetailRow(title: "Authors", value: book.volumeInfo.authors?.joined(separator: ", ") ?? "")
                     DetailRow(title: "Category", value: book.volumeInfo.categories?.joined(separator: ", ") ?? "")
                     DetailRow(title: "Language", value: book.volumeInfo.language.capitalized)
                 } header: {
@@ -67,7 +67,7 @@ struct BookDetailView: View {
                 .listRowBackground(Color.paperYellow.opacity(0.8))
                 
                 Section {
-                    DetailRow(title: "Publisher", value: book.volumeInfo.publisher)
+                    DetailRow(title: "Publisher", value: book.volumeInfo.publisher ?? "")
                     DetailRow(title: "Published Date", value: book.volumeInfo.publishedDate ?? "")
                     DetailRow(title: "Pages count", value: "\(book.volumeInfo.pageCount)")
                 } header: {
@@ -102,10 +102,6 @@ struct BookDetailView: View {
                     .frame(maxWidth: .infinity,alignment: .center)
                 }
                 .foregroundStyle(.black)
-                
-
-                
-                
             }
             
             .sheet(isPresented: $shareManager.isSharePresented, content: {
