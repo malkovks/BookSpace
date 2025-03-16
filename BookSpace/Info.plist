@@ -15,5 +15,17 @@
             </dict>
         </dict>
     </dict>
+    <key>NSUbiquitousContainers</key>
+    <dict>
+        <key>iCloud.com.yourcompany.yourapp</key>
+        <dict>
+            <key>NSUbiquitousContainerIsDocumentScopePublic</key>
+            <true/>
+        </dict>
+    </dict>
+    <key>NSDocumentsDirectoryUsageDescription</key>
+    <string>We are need access to your documents to open and using files such as PDF.</string>
+    <key>UISupportsDocumentBrowser</key>
+    <true/>
 </dict>
 </plist>

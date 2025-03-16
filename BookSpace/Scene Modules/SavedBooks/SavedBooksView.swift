@@ -94,7 +94,6 @@ struct SavedBooksView: View {
                         viewModel.selectedBook = book
                         viewModel.navigationPath.append(BookIdentifiable(book: Book(book)))
                     }
-                    
                 }
             }
         }

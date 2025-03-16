@@ -10,7 +10,7 @@ import SwiftData
 
 struct RootView: View {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([SavedBooks.self])
+        let schema = Schema([SavedBooks.self,SavedPDF.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         return try! ModelContainer(for: schema, configurations: [modelConfiguration])
     }()
@@ -92,7 +92,10 @@ struct RootView: View {
             }, navigateToBookCollection: {
                 coordinator.selectedCategory = .main
             })
-            .modelContext(sharedModelContainer.mainContext)
+        case .pdfLibrary:
+            PDFLibraryView(viewModel: PDFLibraryViewModel(modelContext: sharedModelContainer.mainContext)) {
+                rightButtons = $0
+            }
         }
     }
 }
