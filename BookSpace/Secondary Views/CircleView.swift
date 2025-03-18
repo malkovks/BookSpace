@@ -24,7 +24,3 @@ struct CircleView: View {
         .frame(width: 30, height: 30, alignment: .center)
     }
 }
-
-#Preview {
-    CircleView(isSelected: .constant(true))
-}

@@ -10,6 +10,8 @@ import SwiftUI
 import SwiftData
 
 struct BookCollectionView: View {
+    @EnvironmentObject var networkManager: NetworkMonitor
+    
     @StateObject private var viewModel: BookCollectionViewModel
     @State private var isSearchOpened: Bool = false {
         didSet {
@@ -47,6 +49,9 @@ struct BookCollectionView: View {
                     if viewModel.isFilterOpened {
                         filterView(geometry)
                     }
+                    if !networkManager.isConnected {
+                        networkMessage
+                    }
                 }
                 .overlay {
                     if isSearchOpened {
@@ -55,10 +60,6 @@ struct BookCollectionView: View {
                     
                     if viewModel.isLoading {
                         progressView
-                    }
-                    
-                    if let errorMessage = viewModel.errorMessage {
-                        errorMessageView(errorMessage)
                     }
                 }
                 .task {
@@ -69,6 +70,11 @@ struct BookCollectionView: View {
                     updateRightButtons(
                         AnyView(navigationButtons)
                     )
+                    if !networkManager.isConnected {
+                        viewModel.showAlertView = true
+                        viewModel.status = .error
+                        viewModel.message = "No internet connection"
+                    }
                 }
                 .sheet(isPresented: $shareManager.isSharePresented) {
                     ShareSheet(items: shareManager.shareItems)
@@ -90,8 +96,8 @@ struct BookCollectionView: View {
     
     private func errorMessageView(_ message: String) -> some View {
         return Text(message)
-            .foregroundColor(.red)
-            .font(.largeTitle)
+            .foregroundColor(.secondary)
+            .font(.title2)
             .minimumScaleFactor(0.5)
             .padding()
     }
@@ -193,6 +199,34 @@ struct BookCollectionView: View {
             viewModel.message = text
         }
         
+    }
+    
+    private var networkMessage: some View {
+        VStack {
+            Spacer()
+            Button {
+                Task {
+                    await viewModel.fetchBooks()
+                }
+            } label: {
+                VStack(spacing: 2) {
+                    Text("⚠️ Out of internet. Check connection and try again")
+                        .font(.largeTitle)
+                        .foregroundStyle(.black)
+                        .lineLimit(nil)
+                    if let errorMessage = viewModel.errorMessage {
+                        errorMessageView(errorMessage)
+                    }
+                    Text("Refresh")
+                        .font(.caption)
+                        .foregroundStyle(.updateBlue)
+                }
+            }
+            Spacer()
+        }
+        .padding()
+        .padding(.horizontal, 20)
+        .frame(maxWidth: .infinity)
     }
     
     private var progressView: some View {

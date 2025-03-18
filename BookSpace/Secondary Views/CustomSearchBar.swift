@@ -30,15 +30,6 @@ struct CustomSearchBar: View {
     
     var body: some View {
         ZStack(alignment: .top) {
-//            Color.white.opacity(0.4)
-//                .blur(radius: 10)
-//                .ignoresSafeArea(.all)
-//                .onTapGesture {
-//                    withAnimation {
-//                        onClose()
-//                    }
-//                }
-//            
             VStack(spacing: 10) {
                 HStack {
                     searchField
@@ -50,34 +41,9 @@ struct CustomSearchBar: View {
                 Divider()
                     .background(Color.gray)
                     .padding(.horizontal)
-                
-//                listView
             }
             .frame(maxHeight: .infinity,alignment: .top)
-//            .background(.thickMaterial, in: .rect(cornerRadius: 16))
         }
-    }
-
-    private var listView: some View {
-        List(filteredResults, id: \.self) { result in
-            HStack {
-                Button {
-                    print("selected result: \(result)")
-                } label: {
-                    Text(result)
-                }
-                Spacer()
-                createImage("arrow.right",secondaryColor: .red)
-                    .opacity(0.4)
-            }
-            .listRowBackground(Color.paperYellow)
-        }
-        .scrollDismissesKeyboard(.interactively)
-        .scrollContentBackground(.hidden)
-        .foregroundStyle(.black)
-        .listStyle(.insetGrouped)
-        .frame(maxWidth: .infinity)
-        .transition(.opacity)
     }
     
     private var searchField: some View {

@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-
-
 struct StatusNotificationView: View {
     let type: Status
     var message: String?

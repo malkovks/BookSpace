@@ -32,7 +32,9 @@ struct PDFLibraryView: View {
                 } else {
                     listView
                         .navigationDestination(for: BookPDFIdentifiable.self) {
-                            PDFViewerView(pdf: $0.pdf)
+                            PDFViewerView(pdf: $0.pdf) {
+                                viewModel.navigationPath.removeLast()
+                            }
                         }
                 }
             }

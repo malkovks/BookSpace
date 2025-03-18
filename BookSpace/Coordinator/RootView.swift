@@ -15,6 +15,8 @@ struct RootView: View {
         return try! ModelContainer(for: schema, configurations: [modelConfiguration])
     }()
     
+    
+    @StateObject private var networkManager = NetworkMonitor()
     @StateObject private var coordinator = AppCoordinator()
     @State private var rightButtons: AnyView = AnyView(EmptyView())
     @State private var isNavigationBarHidden: Bool = false
@@ -74,6 +76,7 @@ struct RootView: View {
             } needToHideNavigation: { isHidden in
                 isNavigationBarHidden = isHidden
             }
+            .environmentObject(networkManager)
 
         case .savedBooks:
             SavedBooksView(viewModel: SavedBooksViewModel(modelContext: sharedModelContainer.mainContext)) { buttons in
