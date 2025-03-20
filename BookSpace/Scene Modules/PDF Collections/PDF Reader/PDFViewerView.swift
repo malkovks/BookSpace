@@ -12,11 +12,6 @@ struct PDFViewerView: View {
     let pdf: SavedPDF
     var onBack: () -> Void
     
-//    @State private var settings = PDFSettings()
-    @State private var isSettingsPresented: Bool = false
-    @State private var isEmpty = false
-    @State private var pdfView: PDFView?
-    
     @StateObject private var viewModel = PDFViewerViewModel()
     
     private var pageView: some View {
@@ -40,13 +35,13 @@ struct PDFViewerView: View {
                     .font(.largeTitle)
             }
         }
+        .padding(.top, 80)
     }
     
     private var toolView: some View {
-        let nextEnable = pdfView?.canGoToPreviousPage == false
-        let previousEnable = pdfView?.canGoToNextPage == false
+        let nextEnable = viewModel.pdfView?.canGoToPreviousPage == false
+        let previousEnable = viewModel.pdfView?.canGoToNextPage == false
         return VStack {
-            navigationView
             Spacer()
             HStack {
                 Button {
@@ -70,11 +65,13 @@ struct PDFViewerView: View {
             .frame(maxWidth: .infinity,minHeight: 80,maxHeight: 90,alignment: .bottom)
             .padding(.bottom,20)
         }
+        .opacity(viewModel.settings.displayAsBook ? 1 : 0)
+
     }
     
     private var navigationView: some View {
         VStack {
-            CustomNavigationBar(title: pdf.title) {
+            CustomNavigationBar(title: "") {
                 Button {
                     onBack()
                 } label: {
@@ -84,30 +81,32 @@ struct PDFViewerView: View {
             } rightButtons: {
                 HStack {
                     Button {
-                        isSettingsPresented.toggle()
+                        viewModel.isSettingPresented.toggle()
                     } label: {
                         Label("Settings", systemImage: "gear")
                     }
-                    .opacity(isEmpty ? 0 : 1)
+                    .opacity(viewModel.isEmpty ? 0 : 1)
                 }
             }
-
+            .padding(.top,60)
+            .frame(minHeight: 100, maxHeight: 100)
         }
     }
     
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             pageView
+            navigationView
             toolView
         }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         .ignoresSafeArea()
         .onAppear {
-            isEmpty = fileURL() == nil
+            viewModel.isEmpty = fileURL() == nil
         }
         
-        .sheet(isPresented: $isSettingsPresented) {
+        .sheet(isPresented: $viewModel.isSettingPresented) {
             PDFSettingsView(viewModel: viewModel.settings)
         }
     }
@@ -118,17 +117,14 @@ struct PDFViewerView: View {
     
     private func previousPage(){
         withAnimation(.easeOut(duration: 0.4)) {
-            pdfView?.goToPreviousPage(nil)
+            viewModel.pdfView?.goToPreviousPage(nil)
         }
-        
     }
     
     private func nextPage(){
         withAnimation(.easeOut(duration: 0.4)) {
-            pdfView?.goToNextPage(nil)
+            viewModel.pdfView?.goToNextPage(nil)
         }
-
-        
     }
     
     private func fileURL() -> URL? {

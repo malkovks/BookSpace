@@ -23,18 +23,22 @@ struct ReadLaterView: View {
     
     var body: some View {
         NavigationStack(path: $viewModel.navigationPath) {
-            listView
-                .navigationDestination(for: BookIdentifiable.self) { bookWrapper in
-                    if let selectedBook = viewModel.selectedBook {
-                        BookDetailView(book: bookWrapper.book, isFavorite: selectedBook.isFavorite, isFutureReading: selectedBook.isPlannedToRead) {
-                            viewModel.navigationPath.removeLast()
-                        } isAddedToFavorite: { isFavorite in
-                            viewModel.updateFavStatus(for: selectedBook, isFavorite: isFavorite)
-                        } isAddedToReadLater: { isReadLater in
-                            viewModel.updatePlannedStatus(for: selectedBook, isPlanned: isReadLater)
+            if !viewModel.isModelsEmpty {
+                listView
+                    .navigationDestination(for: BookIdentifiable.self) { bookWrapper in
+                        if let selectedBook = viewModel.selectedBook {
+                            BookDetailView(book: bookWrapper.book, isFavorite: selectedBook.isFavorite, isFutureReading: selectedBook.isPlannedToRead) {
+                                viewModel.navigationPath.removeLast()
+                            } isAddedToFavorite: { isFavorite in
+                                viewModel.updateFavStatus(for: selectedBook, isFavorite: isFavorite)
+                            } isAddedToReadLater: { isReadLater in
+                                viewModel.updatePlannedStatus(for: selectedBook, isPlanned: isReadLater)
+                            }
                         }
                     }
-                }
+            } else {
+                emptyAlertView
+            }
         }
     }
     
@@ -119,12 +123,26 @@ struct ReadLaterView: View {
                 Label("Edit", image: "rectangle.and.pencil.and.ellipsis")
             }
             .tint(Color(uiColor: .systemBlue))
-            
-            
-            
         }
         .animation(.bouncy(duration: 0.2, extraBounce: 0.25), value: viewModel.isEditing)
-        
+    }
+    
+    private var emptyAlertView: some View {
+        VStack(spacing: 20) {
+            Text("No read later books yet")
+                .foregroundColor(.secondary)
+                .italic()
+                .font(.largeTitle)
+            Button {
+                navigateToBookCollection()
+            } label: {
+                Label("Go to book collections", systemImage: "book.pages")
+                    .foregroundStyle(.black)
+                    .font(.headline)
+            }
+            .buttonStyle(.bordered)
+        }
+        .opacity(viewModel.isModelsEmpty ? 1 : 0)
     }
 }
 

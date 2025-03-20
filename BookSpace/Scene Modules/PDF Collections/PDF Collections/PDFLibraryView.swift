@@ -48,6 +48,24 @@ struct PDFLibraryView: View {
                 viewModel.savedPDF(url: $0)
             }
         }
+        .alert("Enter the text",isPresented: $viewModel.isChangeName) {
+            TextField("Enter the text", text: $viewModel.textFieldName)
+            Button("Update") {
+                viewModel.updateName()
+            }
+            Button("Cancel") {
+                viewModel.textFieldName = ""
+            }
+        } message: {
+            Text("Please, Enter new name title of book")
+        }
+        .alert(isPresented: $viewModel.isDeleteFile) {
+            Alert(
+                title: Text("Warning"),
+                message: Text("Do you want to delete selected item?"),
+                primaryButton: .destructive(Text("Delete"), action: viewModel.deletePDF),
+                secondaryButton: .cancel())
+        }
     }
     
     private var navigationButtons: some View {
@@ -67,22 +85,7 @@ struct PDFLibraryView: View {
         ScrollView(.vertical) {
             LazyVGrid(columns: columns,spacing: 20) {
                 ForEach(viewModel.savedFiles, id: \.id) { file in
-                    VStack {
-                        createImage("document",primaryColor: .updateBlue,secondaryColor: .alertRed)
-                        Text(file.title)
-                        Text(file.dateAdded.formattedDate())
-                            .font(.system(size: 12, weight: .light, design: .monospaced))
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity,minHeight: 200, maxHeight: 240,alignment: .center)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.6), lineWidth: 2)
-                    }
-                    .onTapGesture {
-                        viewModel.selectedFile = file
-                        viewModel.navigationPath.append(BookPDFIdentifiable(pdf: file))
-                    }
+                    ListViewCell(file: file, viewModel: viewModel)
                 }
             }
         }
@@ -91,6 +94,47 @@ struct PDFLibraryView: View {
         }
         .padding(.top, 90)
         .padding(.horizontal,10)
+    }
+}
+
+struct ListViewCell: View {
+    let file: SavedPDF
+    let viewModel: PDFLibraryViewModel
+    
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            VStack {
+                createImage("document",primaryColor: .updateBlue,secondaryColor: .alertRed)
+                Text(file.title)
+                Text(file.dateAdded.formattedDate())
+                    .font(.system(size: 12, weight: .light, design: .monospaced))
+            }
+            .padding()
+            .frame(maxWidth: .infinity,minHeight: 200, maxHeight: 240,alignment: .center)
+            .overlay {
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.gray.opacity(0.6), lineWidth: 2)
+            }
+            .onTapGesture {
+                viewModel.selectedFile = file
+                viewModel.navigationPath.append(BookPDFIdentifiable(pdf: file))
+            }
+            VStack {
+                Button {
+                    viewModel.textFieldName = file.title
+                    viewModel.isChangeName.toggle()
+                    viewModel.selectedPDF = file
+                } label: {
+                    createImage("square.and.pencil.circle",primaryColor: .updateBlue,secondaryColor: .alertRed)
+                }
+                Button {
+                    viewModel.isDeleteFile.toggle()
+                    viewModel.selectedPDF = file
+                } label: {
+                    createImage("trash",primaryColor: .alertRed,secondaryColor: .black)
+                }
+            }
+        }
     }
     
 }

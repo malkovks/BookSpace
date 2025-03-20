@@ -26,11 +26,10 @@ struct CustomNavigationBar<LeftButton: View, RightButtons: View>: View {
             Text(title)
                 .font(.system(size: 28, weight: .semibold, design: .rounded))
                 .foregroundStyle(.blackText)
-                .frame(maxWidth: .infinity,maxHeight: 80,alignment: .leading)
+                .frame(maxWidth: .infinity,minHeight: 80, maxHeight: 80,alignment: .leading)
             HStack {
                 rightButtons
             }
-            
         }
         .padding(.horizontal,20)
         .background(.paperYellow)

@@ -8,13 +8,19 @@
 import SwiftUI
 import SwiftData
 
-@Observable
+@MainActor
 class PDFLibraryViewModel: ObservableObject {
+    
+    
     private let fileDataManager: FilesDataManager
-    var savedFiles: [SavedPDF] = []
-    var showingPicker: Bool = false
-    var selectedFile: SavedPDF?
-    var navigationPath = NavigationPath()
+    @Published var savedFiles: [SavedPDF] = []
+    @Published var showingPicker: Bool = false
+    @Published var selectedFile: SavedPDF?
+    @Published var navigationPath = NavigationPath()
+    @Published var isChangeName: Bool = false
+    @Published var textFieldName: String = ""
+    @Published var selectedPDF: SavedPDF?
+    @Published var isDeleteFile: Bool = false
     
     init(modelContext: ModelContext) {
         self.fileDataManager = FilesDataManager(context: modelContext)
@@ -22,6 +28,16 @@ class PDFLibraryViewModel: ObservableObject {
     
     func fetchSavedFiles(){
         savedFiles = fileDataManager.fetchFiles()
+    }
+    
+    func updateName(){
+        guard let selectedPDF, textFieldName != selectedPDF.title else { return }
+        fileDataManager.updateName(of: selectedPDF, to: textFieldName)
+    }
+    
+    func deletePDF(){
+        guard let selectedPDF else { return }
+        fileDataManager.deleteFile(file: selectedPDF)
     }
     
     func deletePDF(at index: IndexSet){

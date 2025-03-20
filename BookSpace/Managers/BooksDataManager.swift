@@ -12,6 +12,7 @@ import WidgetKit
 class BooksDataManager {
     private let context: ModelContext
     
+    
     init(context: ModelContext) {
         self.context = context
     }

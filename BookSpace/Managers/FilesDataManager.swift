@@ -8,6 +8,7 @@
 import SwiftData
 import Foundation
 
+@MainActor
 class FilesDataManager {
     private let context: ModelContext
     
@@ -15,9 +16,19 @@ class FilesDataManager {
         self.context = context
     }
     
+    func updateName(of file: SavedPDF, to newName: String){
+        file.title = newName
+        saveChanges()
+    }
+    
     func fetchFiles() -> [SavedPDF] {
         let fetchDescriptor = FetchDescriptor<SavedPDF>(sortBy: [SortDescriptor(\.dateAdded, order: .reverse)])
-        return (try? context.fetch(fetchDescriptor)) ?? []
+        do {
+            return try context.fetch(fetchDescriptor)
+        } catch {
+            print("Error fetching files: \(error)")
+            return []
+        }
     }
     
     func deleteFile(file: SavedPDF){
@@ -31,6 +42,10 @@ class FilesDataManager {
     }
     
     private func saveChanges(){
-        try? context.save()
+        do {
+            try context.save()
+        } catch {
+            print("Error saving context: \(error)")
+        }
     }
 }

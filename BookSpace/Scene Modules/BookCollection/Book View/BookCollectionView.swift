@@ -70,12 +70,17 @@ struct BookCollectionView: View {
                     updateRightButtons(
                         AnyView(navigationButtons)
                     )
-                    if !networkManager.isConnected {
+                }
+                .onReceive(networkManager.$isConnected) { isConnected in
+                    if !isConnected {
                         viewModel.showAlertView = true
                         viewModel.status = .error
                         viewModel.message = "No internet connection"
+                    } else {
+                        viewModel.showAlertView = false
                     }
                 }
+                
                 .sheet(isPresented: $shareManager.isSharePresented) {
                     ShareSheet(items: shareManager.shareItems)
                 }

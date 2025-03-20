@@ -8,11 +8,12 @@
 import SwiftUI
 import PDFKit
 
-@Observable
+
 class PDFViewerViewModel: ObservableObject {
-    var settings = PDFSettingsViewModel()
-    var isEmpty = false
-    var pdfView: PDFView?
+    @Published var settings = PDFSettingsViewModel()
+    @Published var isEmpty = false
+    @Published var pdfView: PDFView?
+    @Published var isSettingPresented: Bool = false
     
     
 }
