@@ -52,10 +52,14 @@ class PDFLibraryViewModel: ObservableObject {
             print("❌ Can not copy file to documents directory")
             return
         }
+        
+        
 
         do {
             let bookmarkData = try localURL.bookmarkData(options: .minimalBookmark)
-            let file = SavedPDF(title: localURL.lastPathComponent, bookmarkData: bookmarkData)
+            let pdfData = try Data(contentsOf: localURL)
+            
+            let file = SavedPDF(title: localURL.lastPathComponent, bookmarkData: bookmarkData, pdfData: pdfData)
             fileDataManager.saveFile(file: file)
             fetchSavedFiles()
         } catch {

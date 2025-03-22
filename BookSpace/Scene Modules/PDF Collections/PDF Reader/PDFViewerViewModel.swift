@@ -14,6 +14,6 @@ class PDFViewerViewModel: ObservableObject {
     @Published var isEmpty = false
     @Published var pdfView: PDFView?
     @Published var isSettingPresented: Bool = false
-    
-    
+    @Published var isThumbnailPresented: Bool = false
+    @Published var isSearchPresented: Bool = false
 }

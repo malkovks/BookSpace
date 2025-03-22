@@ -14,10 +14,41 @@ struct PDFViewerView: View {
     
     @StateObject private var viewModel = PDFViewerViewModel()
     
+    var body: some View {
+        ZStack(alignment: .top) {
+            pageView
+            if viewModel.isThumbnailPresented {
+                thumbnailView
+            }
+            navigationView
+            toolView
+        }
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
+        .ignoresSafeArea()
+        .onAppear {
+            viewModel.isEmpty = pdf.pdfData.isEmpty
+        }
+        
+        .sheet(isPresented: $viewModel.isSettingPresented) {
+            PDFSettingsView(viewModel: viewModel.settings)
+        }
+    }
+    
+    private var thumbnailView: some View {
+        HStack {
+            Spacer()
+            ThumbnailView(pdfView: viewModel.pdfView)
+                .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
+                .padding(.top, 100)
+                .frame(maxWidth: 50,alignment: .trailing)
+        }
+    }
+    
     private var pageView: some View {
         VStack {
-            if let link = fileURL() {
-                PDFKitPreview(url: link, settings: $viewModel.settings, pdfView: $viewModel.pdfView)
+            if let doc = PDFDocument(data: pdf.pdfData) {
+                PDFKitPreview(doc: doc, settings: $viewModel.settings, pdfView: $viewModel.pdfView)
                     .navigationTitle(pdf.title)
                     .ignoresSafeArea(.all)
                     .gesture(
@@ -77,15 +108,37 @@ struct PDFViewerView: View {
                 } label: {
                     createImage("chevron.left")
                 }
-
             } rightButtons: {
                 HStack {
                     Button {
-                        viewModel.isSettingPresented.toggle()
+                        withAnimation {
+                            viewModel.isSearchPresented.toggle()
+                        }
                     } label: {
-                        Label("Settings", systemImage: "gear")
+                        createImage("text.magnifyingglass")
+                    }
+                    
+                    Button {
+                        withAnimation {
+                            viewModel.isSettingPresented.toggle()
+                        }
+                    } label: {
+                        createImage("gear")
                     }
                     .opacity(viewModel.isEmpty ? 0 : 1)
+                    Button {
+                        withAnimation {
+                            viewModel.isThumbnailPresented.toggle()
+                        }
+                    } label: {
+                        withAnimation {
+                            createImage(
+                                viewModel.isThumbnailPresented ?
+                                "inset.filled.righthalf.arrow.right.rectangle" :
+                                    "inset.filled.trailinghalf.rectangle"
+                            )
+                        }
+                    }
                 }
             }
             .padding(.top,60)
@@ -93,23 +146,7 @@ struct PDFViewerView: View {
         }
     }
     
-    var body: some View {
-        ZStack(alignment: .top) {
-            pageView
-            navigationView
-            toolView
-        }
-        .navigationBarBackButtonHidden(true)
-        .toolbar(.hidden, for: .navigationBar)
-        .ignoresSafeArea()
-        .onAppear {
-            viewModel.isEmpty = fileURL() == nil
-        }
-        
-        .sheet(isPresented: $viewModel.isSettingPresented) {
-            PDFSettingsView(viewModel: viewModel.settings)
-        }
-    }
+    
     
     private func isTwoPage() -> Bool {
         viewModel.settings.displayMode == .singlePage || viewModel.settings.displayMode == .twoUp
@@ -124,21 +161,6 @@ struct PDFViewerView: View {
     private func nextPage(){
         withAnimation(.easeOut(duration: 0.4)) {
             viewModel.pdfView?.goToNextPage(nil)
-        }
-    }
-    
-    private func fileURL() -> URL? {
-        do {
-            var isStale = false
-            let url = try URL(resolvingBookmarkData: pdf.bookmarkData, bookmarkDataIsStale: &isStale)
-            
-            if isStale {
-                print("⚠️ Bookmark is not accessible anymore, consider refreshing the data")
-            }
-            return url
-        } catch {
-            print("❌ Error recovering file path: \(error.localizedDescription)")
-            return nil
         }
     }
 }

@@ -82,8 +82,6 @@ struct CustomSearchBar: View {
 }
 
 #Preview {
-    
-    
     CustomSearchBar(searchResults: .constant(["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth", "Tenth"]), placeholder: "Enter request", text: .constant("")) {
         
     } onClose: {

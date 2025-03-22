@@ -13,15 +13,17 @@ final class SavedPDF {
     @Attribute(.unique) var id: UUID
     var title: String
     var bookmarkData: Data
+    var pdfData: Data
     var dateAdded: Date
     var isFavorite: Bool
     var isPlanned: Bool
     var isCompleteReading: Bool
     
-    init(title: String, bookmarkData: Data, isFavorite: Bool = false, isPlanned: Bool = false, isCompleteReading: Bool = false) {
+    init(title: String, bookmarkData: Data, pdfData: Data, isFavorite: Bool = false, isPlanned: Bool = false, isCompleteReading: Bool = false) {
         self.id = UUID()
         self.title = title
         self.bookmarkData = bookmarkData
+        self.pdfData = pdfData
         self.dateAdded = Date()
         self.isFavorite = isFavorite
         self.isPlanned = isPlanned
