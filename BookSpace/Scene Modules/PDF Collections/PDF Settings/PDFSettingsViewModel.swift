@@ -14,4 +14,5 @@ class PDFSettingsViewModel: ObservableObject {
     var displayMode : PDFDisplayMode = .singlePage
     var displayAsBook: Bool = false
     var autoScales: Bool = true
+    var orientation: PDFDisplayDirection = .vertical
 }
