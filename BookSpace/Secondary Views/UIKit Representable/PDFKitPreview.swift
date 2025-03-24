@@ -9,9 +9,8 @@ import SwiftUI
 import PDFKit
 
 struct PDFKitPreview: UIViewRepresentable {
-    
     let doc: PDFDocument
-    @Binding var settings: PDFSettingsViewModel
+    @EnvironmentObject var settings: PDFSettingsViewModel
     @Binding var pdfView: PDFView?
 
     func makeUIView(context: Context) -> PDFView {
@@ -20,9 +19,9 @@ struct PDFKitPreview: UIViewRepresentable {
         pdfView.document = doc
         pdfView.displayMode = settings.displayMode
         pdfView.displaysAsBook = settings.displayAsBook
-        pdfView.autoScales = /*settings.autoScales*/false
+        pdfView.autoScales = settings.autoScales
         pdfView.backgroundColor = UIColor(Color.paperYellow).withAlphaComponent(0.2)
-        pdfView.displayDirection = .horizontal
+        pdfView.displayDirection = settings.orientation
         pdfView.minScaleFactor = 1.0
         pdfView.maxScaleFactor = 2.0
         pdfView.scaleFactor = pdfView.scaleFactorForSizeToFit

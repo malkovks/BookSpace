@@ -25,6 +25,8 @@ enum ColorPickerMode: CaseIterable {
 }
 
 struct CustomColorPickerView: View {
+    var handleSelectedColor: (_ color: Color) -> Void
+    
     @State private var selectedMode: ColorPickerMode = .spectrum
     @State private var selectedColor: Color = .yellow
     @State private var opacity: Double = 1.0
@@ -219,5 +221,7 @@ struct OpacitySlider: View {
 }
 
 #Preview {
-    return CustomColorPickerView()
+    CustomColorPickerView { color in
+        
+    }
 }

@@ -31,7 +31,7 @@ struct PDFViewerView: View {
         }
         
         .sheet(isPresented: $viewModel.isSettingPresented) {
-            PDFSettingsView(viewModel: viewModel.settings)
+            PDFSettingsView()
         }
     }
     
@@ -48,7 +48,8 @@ struct PDFViewerView: View {
     private var pageView: some View {
         VStack {
             if let doc = PDFDocument(data: pdf.pdfData) {
-                PDFKitPreview(doc: doc, settings: $viewModel.settings, pdfView: $viewModel.pdfView)
+                PDFKitPreview(doc: doc, pdfView: $viewModel.pdfView)
+                    .environmentObject(viewModel.settings)
                     .navigationTitle(pdf.title)
                     .ignoresSafeArea(.all)
                     .gesture(

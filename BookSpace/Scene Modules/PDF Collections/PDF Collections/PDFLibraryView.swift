@@ -66,6 +66,25 @@ struct PDFLibraryView: View {
                 primaryButton: .destructive(Text("Delete"), action: viewModel.deletePDF),
                 secondaryButton: .cancel())
         }
+        .navigationDestination(for: String.self) { destination in
+            if destination == "scan" {
+                ScannerView { result in
+                    handleScan(result)
+                }
+            } else if destination == "preview" {
+                
+            }
+        }
+    }
+    
+    private func handleScan(_ result: Result<String,Error>) {
+        switch result {
+        case .success(let success):
+            print("success scanning")
+            viewModel.navigationPath.append("preview")
+        case .failure(let failure):
+            print("failure scanning")
+        }
     }
     
     private var navigationButtons: some View {
@@ -77,6 +96,13 @@ struct PDFLibraryView: View {
             } label: {
                 Label("Add new file", systemImage: "plus")
                     .tint(.black)
+            }
+            Button {
+                withAnimation {
+                    viewModel.navigationPath.append("scan")
+                }
+            } label: {
+                createImage("camera.viewfinder",primaryColor: .alertRed,secondaryColor: .black)
             }
         }
     }

@@ -36,9 +36,50 @@ class FilesDataManager {
         saveChanges()
     }
     
-    func saveFile(file: SavedPDF){
-        context.insert(file)
+    func saveFile(url: URL){
+        guard let localURL = copyPDFToDocumentsDirectory(from: url) else {
+            print("❌ Can not copy file to documents directory")
+            return
+        }
+
+        do {
+            let bookmarkData = try localURL.bookmarkData(options: .minimalBookmark)
+            let pdfData = try Data(contentsOf: localURL)
+            
+            let file = SavedPDF(title: localURL.lastPathComponent, bookmarkData: bookmarkData, pdfData: pdfData)
+            context.insert(file)
+            
+        } catch {
+            print("❌ Cannot create bookmarkData: \(error.localizedDescription)")
+        }
+        
+        
         saveChanges()
+    }
+    
+    private func copyPDFToDocumentsDirectory(from sourceURL: URL) -> URL? {
+        guard sourceURL.startAccessingSecurityScopedResource() else {
+            print("❌ Did not get access to the resource")
+            return nil
+        }
+        
+        let fileManager = FileManager.default
+        let directory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let destinationURL = directory.appendingPathComponent(sourceURL.lastPathComponent)
+
+        if fileManager.fileExists(atPath: destinationURL.path) {
+            print("📁 File almost already exists: \(destinationURL.path)")
+            return destinationURL
+        }
+
+        do {
+            try fileManager.copyItem(at: sourceURL, to: destinationURL)
+            print("✅ File copied successfully: \(destinationURL.path)")
+            return destinationURL
+        } catch {
+            print("❌ Error copying file: \(error.localizedDescription)")
+            return nil
+        }
     }
     
     private func saveChanges(){

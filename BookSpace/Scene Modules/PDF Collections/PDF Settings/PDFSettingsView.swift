@@ -10,61 +10,78 @@ import PDFKit
 
 struct PDFSettingsView: View {
     @Environment(\.dismiss) var dismiss
-    @ObservedObject var viewModel: PDFSettingsViewModel
+    @StateObject private var viewModel: PDFSettingsViewModel = .init()
+    @State private var showColorPicker: Bool = false
     
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    Picker("Mode", selection: $viewModel.displayMode) {
-                        Text("One page").tag(PDFDisplayMode.singlePage)
-                        Text("Continuity").tag(PDFDisplayMode.singlePageContinuous)
-                        Text("Two page").tag(PDFDisplayMode.twoUp)
-                        Text("Two page(book)").tag(PDFDisplayMode.twoUpContinuous)
+            ZStack {
+                Color.gray
+                    .ignoresSafeArea()
+                Form {
+                    Section {
+                        Picker("Select Mode", selection: $viewModel.displayMode) {
+                            Text("One page").tag(PDFDisplayMode.singlePage)
+                            Text("Continuity").tag(PDFDisplayMode.singlePageContinuous)
+                            Text("Two page").tag(PDFDisplayMode.twoUp)
+                            Text("Two page(book)").tag(PDFDisplayMode.twoUpContinuous)
+                        }
+                        .pickerStyle(.inline)
+                    } header: {
+                        Text("Display Mode")
                     }
-                    .pickerStyle(.segmented)
-                } header: {
-                    Text("Display Mode")
-                }
-                
-                Section {
-                    Toggle("Book mode on", isOn: $viewModel.displayAsBook)
-                    Toggle("Page scaling", isOn: $viewModel.autoScales)
-                    Picker("Orientation", selection: $viewModel.orientation) {
-                        Text("Horizontal").tag(PDFDisplayDirection.horizontal)
-                        Text("Vertical").tag(PDFDisplayDirection.vertical)
+                    
+                    Section {
+                        Toggle("Book mode on", isOn: $viewModel.displayAsBook)
+                        Toggle("Page scaling", isOn: $viewModel.autoScales)
+                        Picker("Orientation", selection: $viewModel.orientation) {
+                            Text("Horizontal").tag(PDFDisplayDirection.horizontal)
+                            Text("Vertical").tag(PDFDisplayDirection.vertical)
+                        }
                     }
+                    Section {
+                        HStack {
+                            Button {
+                                showColorPicker.toggle()
+                            } label: {
+                                Label("Background Preview color", systemImage: "paintpalette")
+                            }
+                            
+                            Spacer()
+                            Circle()
+                                .fill(Color.alertRed)
+                                .frame(height: 20)
+                            
+                            
+                        }
+                        
+                    } header: {
+                        Text("Color Selection")
+                    }
+                    
+                    
                 }
-                Section {
-                    HStack {
-                        Circle()
-                            .fill(Color.alertRed)
-                        Spacer()
+                .navigationTitle("PDF Settings")
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
                         Button {
-                            print("Open color  picker")
+                            dismiss()
                         } label: {
-                            Label("Open Color Picker", systemImage: "paintpalette")
+                            createImage("chevron.down",fontSize: 28)
                         }
                         
                     }
-
-                } header: {
-                    Text("Color Selection")
                 }
-                
-                
-            }
-            .navigationTitle("PDF Settings")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        createImage("chevron.down",fontSize: 28)
+                .sheet(isPresented: $showColorPicker) {
+                    CustomColorPickerView() { color in
+                        
                     }
-
                 }
             }
         }
     }
+}
+
+#Preview {
+    return PDFSettingsView()
 }
