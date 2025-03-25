@@ -285,6 +285,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BooksWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BooksWidget;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Please allow access to camera for detecting and handling text";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -317,6 +318,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BooksWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BooksWidget;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Please allow access to camera for detecting and handling text";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

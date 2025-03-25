@@ -43,6 +43,19 @@ struct PDFLibraryView: View {
             viewModel.fetchSavedFiles()
             updateRightButtons(AnyView(navigationButtons))
         }
+        .overlay(content: {
+            Group {
+                if viewModel.isDeleteFile {
+                    Color.secondary
+                        .ignoresSafeArea()
+                    
+                    alertView
+                    
+                    
+                }
+            }
+        })
+        
         .sheet(isPresented: $viewModel.showingPicker) {
             PDFPickerView {
                 viewModel.savedPDF(url: $0)
@@ -59,13 +72,7 @@ struct PDFLibraryView: View {
         } message: {
             Text("Please, Enter new name title of book")
         }
-        .alert(isPresented: $viewModel.isDeleteFile) {
-            Alert(
-                title: Text("Warning"),
-                message: Text("Do you want to delete selected item?"),
-                primaryButton: .destructive(Text("Delete"), action: viewModel.deletePDF),
-                secondaryButton: .cancel())
-        }
+        
         .navigationDestination(for: String.self) { destination in
             if destination == "scan" {
                 ScannerView { result in
@@ -75,6 +82,17 @@ struct PDFLibraryView: View {
                 
             }
         }
+    }
+    
+    private var alertView: some View {
+        AlertView(isPresented: $viewModel.isDeleteFile, model: AlertModel(title: "Warning", message: "Do you want to delete selected item?", confirmActionText: "Delete", cancelActionText: "Cancel", confirmAction: {
+            viewModel.deletePDF()
+            viewModel.isDeleteFile = false
+        }, cancelAction: {
+            viewModel.isDeleteFile = false
+        }))
+        .transition(.move(edge: .top).combined(with: .blurReplace))
+        .zIndex(1)
     }
     
     private func handleScan(_ result: Result<String,Error>) {

@@ -33,13 +33,15 @@ struct ScannerView: UIViewControllerRepresentable {
         }
         
         func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
-            guard scan.pageCount > 0 else {
-                completion(.failure(NSError(domain: "OCR", code: 0, userInfo: nil)))
-                return
+            TextRecognitionManager.shared.processScanResults(scan) { results in
+                DispatchQueue.main.async {
+                    self.completion(results)
+                }
             }
-            
-            let image = scan.imageOfPage(at: 0)
-            recognizeText(from: image)
+        }
+        
+        func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: any Error) {
+            completion(.failure(error))
         }
         
         func recognizeText(from image: UIImage){
