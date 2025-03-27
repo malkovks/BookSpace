@@ -23,6 +23,10 @@ extension View {
             self
         }
     }
+    
+    func backgroundBlurEffect(style: UIBlurEffect.Style = .systemThickMaterialLight) -> some View {
+        return background(BlurView(style: style)) 
+    }
 }
 
 

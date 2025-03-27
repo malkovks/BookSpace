@@ -10,8 +10,10 @@ import PDFKit
 import SwiftData
 
 struct PDFPreviewView: View {
-    @EnvironmentObject var settings: PDFSettingsViewModel
+    @StateObject var settings: PDFSettingsViewModel = .init()
     let text: String
+    
+    
     private let fileDataManager: FilesDataManager
     @State private var isLoading: Bool = true
     @State private var pdfURL: URL?
@@ -31,8 +33,6 @@ struct PDFPreviewView: View {
                 ProgressView("Creating file")
             } else if let pdfURL, let pdfData {
                 let document = PDFDocument(data: pdfData) ?? PDFDocument()
-                
-                
                 PDFKitPreview(doc: document, pdfView: $pdfView)
                     .environmentObject(settings)
             } else {

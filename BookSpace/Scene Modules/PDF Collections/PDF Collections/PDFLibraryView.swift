@@ -9,6 +9,8 @@ import SwiftUI
 
 struct PDFLibraryView: View {
     @StateObject private var viewModel: PDFLibraryViewModel
+    @StateObject private var settingViewModel: PDFSettingsViewModel = .init()
+    private let cameraManager = CameraAccessManager.shared
     
     var updateRightButtons: (_ buttons: AnyView) -> Void
     
@@ -43,18 +45,21 @@ struct PDFLibraryView: View {
             viewModel.fetchSavedFiles()
             updateRightButtons(AnyView(navigationButtons))
         }
-        .overlay(content: {
-            Group {
-                if viewModel.isDeleteFile {
-                    Color.secondary
-                        .ignoresSafeArea()
-                    
-                    alertView
-                    
-                    
-                }
-            }
+//        .fullScreenCover(isPresented: $viewModel.showCameraView, content: {
+//            
+//            
+//            
+//            .ignoresSafeArea()
+//            .padding(.top,90)
+//            .navigationBarBackButtonHidden(true)
+//        })
+        
+        .fullScreenCover(isPresented: $viewModel.isDeleteFile, content: {
+            alertView
         })
+        .transaction { transaction in
+            transaction.disablesAnimations = true
+        }
         
         .sheet(isPresented: $viewModel.showingPicker) {
             PDFPickerView {
@@ -74,34 +79,43 @@ struct PDFLibraryView: View {
         }
         
         .navigationDestination(for: String.self) { destination in
-            if destination == "scan" {
+            if destination == "preview" {
+                PDFPreviewView(text: viewModel.detectedText, context: viewModel.modelContext)
+            } else if destination == "scan"{
+                
                 ScannerView { result in
                     handleScan(result)
                 }
-            } else if destination == "preview" {
-                
             }
         }
     }
     
+    private var accessAlertView: some View {
+        AlertView(
+            isShowingAlert: $viewModel.showAlert,
+            model: AlertModel(message: viewModel.alertMessage, confirmActionText: "", cancelActionText: "",hideButton: true , confirmAction: {
+                viewModel.showAlert = false
+            }, cancelAction: {
+                viewModel.showAlert = false
+            }))
+    }
+    
     private var alertView: some View {
-        AlertView(isPresented: $viewModel.isDeleteFile, model: AlertModel(title: "Warning", message: "Do you want to delete selected item?", confirmActionText: "Delete", cancelActionText: "Cancel", confirmAction: {
+        AlertView(isShowingAlert: $viewModel.isDeleteFile, model: AlertModel(title: "Warning", message: "Do you want to delete selected item?", confirmActionText: "Delete", cancelActionText: "Cancel", confirmAction: {
             viewModel.deletePDF()
             viewModel.isDeleteFile = false
         }, cancelAction: {
             viewModel.isDeleteFile = false
         }))
-        .transition(.move(edge: .top).combined(with: .blurReplace))
-        .zIndex(1)
     }
     
     private func handleScan(_ result: Result<String,Error>) {
         switch result {
-        case .success(let success):
-            print("success scanning")
+        case .success(let text):
+            viewModel.detectedText = text
             viewModel.navigationPath.append("preview")
         case .failure(let failure):
-            print("failure scanning")
+            print("Scanning failed: \(failure.localizedDescription)")
         }
     }
     
@@ -116,8 +130,18 @@ struct PDFLibraryView: View {
                     .tint(.black)
             }
             Button {
-                withAnimation {
-                    viewModel.navigationPath.append("scan")
+                Task {
+                    await cameraManager.requestAccess(completion: { result in
+                        DispatchQueue.main.async {
+                            switch result {
+                            case .success :
+                                viewModel.navigationPath.append("scan")
+                                viewModel.showCameraView = true
+                            case .failure(let failure):
+                                handleCameraError(failure)
+                            }
+                        }
+                    })
                 }
             } label: {
                 createImage("camera.viewfinder",primaryColor: .alertRed,secondaryColor: .black)
@@ -139,46 +163,22 @@ struct PDFLibraryView: View {
         .padding(.top, 90)
         .padding(.horizontal,10)
     }
+    
+    @MainActor
+    private func handleCameraError(_ error: CameraAccess){
+        switch error {
+        case .denied:
+            viewModel.alertMessage = "Camera access is denied"
+        case .restricted:
+            viewModel.alertMessage = "Camera access is restricted"
+        case .notDetermined:
+            viewModel.alertMessage = "Camera access not determined"
+        case .unknown:
+            viewModel.alertMessage = "Unknown error"
+        }
+        
+        viewModel.showAlert = true
+    }
 }
 
-struct ListViewCell: View {
-    let file: SavedPDF
-    let viewModel: PDFLibraryViewModel
-    
-    var body: some View {
-        ZStack(alignment: .topTrailing) {
-            VStack {
-                createImage("document",primaryColor: .updateBlue,secondaryColor: .alertRed)
-                Text(file.title)
-                Text(file.dateAdded.formattedDate())
-                    .font(.system(size: 12, weight: .light, design: .monospaced))
-            }
-            .padding()
-            .frame(maxWidth: .infinity,minHeight: 200, maxHeight: 240,alignment: .center)
-            .overlay {
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.gray.opacity(0.6), lineWidth: 2)
-            }
-            .onTapGesture {
-                viewModel.selectedFile = file
-                viewModel.navigationPath.append(BookPDFIdentifiable(pdf: file))
-            }
-            VStack {
-                Button {
-                    viewModel.textFieldName = file.title
-                    viewModel.isChangeName.toggle()
-                    viewModel.selectedPDF = file
-                } label: {
-                    createImage("square.and.pencil.circle",primaryColor: .updateBlue,secondaryColor: .alertRed)
-                }
-                Button {
-                    viewModel.isDeleteFile.toggle()
-                    viewModel.selectedPDF = file
-                } label: {
-                    createImage("trash",primaryColor: .alertRed,secondaryColor: .black)
-                }
-            }
-        }
-    }
-    
-}
+

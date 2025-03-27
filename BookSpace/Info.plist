@@ -2,30 +2,28 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSExceptionDomains</key>
-        <dict>
-            <key>books.google.com</key>
-            <dict>
-                <key>NSIncludesSubdomains</key>
-                <true/>
-                <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <true/>
-            </dict>
-        </dict>
-    </dict>
-    <key>NSUbiquitousContainers</key>
-    <dict>
-        <key>iCloud.com.yourcompany.yourapp</key>
-        <dict>
-            <key>NSUbiquitousContainerIsDocumentScopePublic</key>
-            <true/>
-        </dict>
-    </dict>
-    <key>NSDocumentsDirectoryUsageDescription</key>
-    <string>We are need access to your documents to open and using files such as PDF.</string>
-    <key>UISupportsDocumentBrowser</key>
-    <true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>books.google.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
+	<key>NSDocumentsDirectoryUsageDescription</key>
+	<string>We are need access to your documents to open and using files such as PDF.</string>
+	<key>NSUbiquitousContainers</key>
+	<dict>
+		<key>iCloud.com.yourcompany.yourapp</key>
+		<dict>
+			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
+			<true/>
+		</dict>
+	</dict>
 </dict>
 </plist>

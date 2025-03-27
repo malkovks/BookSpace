@@ -24,7 +24,7 @@ class CameraAccessManager {
         return AVCaptureDevice.authorizationStatus(for: .video)
     }
     
-    func requestAccess(completion: @escaping (Result<Bool,CameraAccess>) -> Void) async {
+    func requestAccess(completion: @escaping (_ result: Result<Bool,CameraAccess>) -> Void) async {
         do {
             let status = try await checkCameraAccess()
             

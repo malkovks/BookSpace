@@ -13,16 +13,28 @@ class PDFLibraryViewModel: ObservableObject {
     
     
     private let fileDataManager: FilesDataManager
-    @Published var savedFiles: [SavedPDF] = []
-    @Published var showingPicker: Bool = false
-    @Published var selectedFile: SavedPDF?
+    @Published var modelContext: ModelContext
     @Published var navigationPath = NavigationPath()
-    @Published var isChangeName: Bool = false
-    @Published var textFieldName: String = ""
+    
+    
+    @Published var savedFiles: [SavedPDF] = []
     @Published var selectedPDF: SavedPDF?
+    @Published var selectedFile: SavedPDF?
+    
+    //String values
+    @Published var textFieldName: String = ""
+    @Published var alertMessage: String = "Unknown error"
+    @Published var detectedText: String = ""
+    
+    //Flags
     @Published var isDeleteFile: Bool = false
+    @Published var showAlert: Bool = false
+    @Published var isChangeName: Bool = false
+    @Published var showingPicker: Bool = false
+    @Published var showCameraView: Bool = false
     
     init(modelContext: ModelContext) {
+        self.modelContext = modelContext
         self.fileDataManager = FilesDataManager(context: modelContext)
     }
     

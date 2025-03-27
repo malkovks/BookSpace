@@ -10,7 +10,6 @@ import VisionKit
 import Vision
 
 struct ScannerView: UIViewControllerRepresentable {
-    
     var completion: (Result<String,Error>) -> Void
     
     func makeCoordinator() -> Coordinator {
@@ -42,27 +41,6 @@ struct ScannerView: UIViewControllerRepresentable {
         
         func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: any Error) {
             completion(.failure(error))
-        }
-        
-        func recognizeText(from image: UIImage){
-            let request = VNRecognizeTextRequest { request, error in
-                guard let observation = request.results as? [VNRecognizedTextObservation], error == nil else {
-                    self.completion(.failure(error ?? NSError(domain: "OCR", code: 0)))
-                    return
-                }
-                let scannedText = observation.compactMap { $0.topCandidates(1).first?.string }.joined(separator: "\n")
-                self.completion(.success(scannedText))
-            }
-            let handler = VNImageRequestHandler(cgImage: image.cgImage!,options: [:])
-            
-            DispatchQueue.global(qos: .userInitiated).async {
-                do {
-                    try handler.perform([request])
-                } catch {
-                    self.completion(.failure(error))
-                }
-            }
-            
         }
     }
 }

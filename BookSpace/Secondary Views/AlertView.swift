@@ -12,55 +12,57 @@ struct AlertModel {
     let message: String
     let confirmActionText: String
     let cancelActionText: String
+    var hideButton = false
     var confirmAction: (() -> Void)
     var cancelAction: (() -> Void)
 }
 
 struct AlertView: View {
-        
-    @Binding var isPresented: Bool
+    
+    @Binding var isShowingAlert: Bool
     let model: AlertModel
-
+    @State private var isPresented: Bool = false
+    
     
     
     var body: some View {
         ZStack(alignment: .top) {
-            
-            Color.skyBlue
+            BlurView(style: .systemThickMaterialDark)
+                .opacity(0.9)
                 .ignoresSafeArea()
-            Color.clear
-                .background(.thickMaterial)
-                .edgesIgnoringSafeArea(.all)
-                .animation(.easeInOut(duration: 0.5), value: isPresented)
                 .onTapGesture {
                     withAnimation {
-                        isPresented = false
+                        isShowingAlert = false
                     }
-                    model.cancelAction()
                 }
-            
-            if isPresented {
+            if isShowingAlert {
                 VStack {
                     Spacer()
                     containerView
                     buttonContainerView
                         .padding(.top, 24)
                         .padding(.horizontal, 10)
+                        .opacity(model.hideButton ? 0 : 1)
                     Spacer()
                 }
-                .transition(.slide.animation(.easeInOut(duration: 0.5)))
-            }
-            if isPresented {
+                .padding()
                 closeButton
-                    .transition(.slide.animation(.easeInOut(duration: 0.5)))
                     .padding()
             }
-            
-            
         }
-        .onTapGesture {
-            model.cancelAction()
+        .animation(.default, value: isPresented)
+        .onAppear {
+            withAnimation(.easeInOut(duration: 0.5)) {
+                isPresented = true
+            }
         }
+        .onDisappear {
+            withAnimation(.easeInOut(duration: 0.5)) {
+                isPresented = false
+            }
+        }
+        .animation(.interactiveSpring(duration: 1), value: isShowingAlert)
+        
     }
     
     private var closeButton: some View {
@@ -68,7 +70,6 @@ struct AlertView: View {
             Spacer()
             Button {
                 withAnimation {
-                    isPresented = false
                     model.cancelAction()
                 }
             } label: {
@@ -113,15 +114,13 @@ struct AlertView: View {
         HStack(spacing: 24) {
             Button {
                 withAnimation {
-                    isPresented = false
                     model.confirmAction()
                 }
             } label: {
-                HStack(alignment: .center) {
+                HStack(alignment: .center,spacing: 10) {
                     createImage("trash.square",primaryColor: .skyBlue,secondaryColor: .white)
                     Text(model.confirmActionText)
                         .foregroundStyle(.skyBlue)
-                    Spacer()
                 }
                 .padding()
                 .background(Color.alertRed)
@@ -131,7 +130,6 @@ struct AlertView: View {
             
             Button {
                 withAnimation {
-                    isPresented = false
                     model.cancelAction()
                 }
                 
@@ -139,7 +137,6 @@ struct AlertView: View {
                 HStack(alignment: .center) {
                     createImage("xmark.diamond.fill",primaryColor: .blue,secondaryColor: .white)
                     Text(model.cancelActionText)
-                    Spacer()
                 }
                 .padding()
                 .background(Color.paperYellow)
@@ -157,5 +154,5 @@ struct AlertView: View {
         
     }
 
-    AlertView(isPresented: .constant(true), model: mockModel)
+    AlertView( isShowingAlert: .constant(true), model: mockModel)
 }
