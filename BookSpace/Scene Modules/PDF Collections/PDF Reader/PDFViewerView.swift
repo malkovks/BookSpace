@@ -32,6 +32,7 @@ struct PDFViewerView: View {
         
         .sheet(isPresented: $viewModel.isSettingPresented) {
             PDFSettingsView()
+                .environmentObject(viewModel.settings)
         }
     }
     

@@ -10,7 +10,7 @@ import PDFKit
 
 struct PDFSettingsView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject private var viewModel: PDFSettingsViewModel = .init()
+    @EnvironmentObject var viewModel: PDFSettingsViewModel
     @State private var showColorPicker: Bool = false
     
     var body: some View {
@@ -49,7 +49,7 @@ struct PDFSettingsView: View {
                             
                             Spacer()
                             Circle()
-                                .fill(Color.alertRed)
+                                .fill(viewModel.backgroundColor)
                                 .frame(height: 20)
                             
                             
@@ -67,16 +67,14 @@ struct PDFSettingsView: View {
                         Button {
                             dismiss()
                         } label: {
-                            createImage("chevron.down",fontSize: 28)
+                            createImage("chevron.down",fontSize: 24)
                         }
                         
                     }
                 }
-                .sheet(isPresented: $showColorPicker) {
-                    CustomColorPickerView() { color in
-                        
-                    }
-                }
+                .navigationDestination(isPresented: $showColorPicker, destination: {
+                    CustomColorPickerView(color: $viewModel.backgroundColor)
+                })
             }
         }
     }

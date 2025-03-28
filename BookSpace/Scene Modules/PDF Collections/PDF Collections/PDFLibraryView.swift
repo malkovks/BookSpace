@@ -45,21 +45,10 @@ struct PDFLibraryView: View {
             viewModel.fetchSavedFiles()
             updateRightButtons(AnyView(navigationButtons))
         }
-//        .fullScreenCover(isPresented: $viewModel.showCameraView, content: {
-//            
-//            
-//            
-//            .ignoresSafeArea()
-//            .padding(.top,90)
-//            .navigationBarBackButtonHidden(true)
-//        })
         
         .fullScreenCover(isPresented: $viewModel.isDeleteFile, content: {
             alertView
         })
-        .transaction { transaction in
-            transaction.disablesAnimations = true
-        }
         
         .sheet(isPresented: $viewModel.showingPicker) {
             PDFPickerView {
@@ -77,17 +66,16 @@ struct PDFLibraryView: View {
         } message: {
             Text("Please, Enter new name title of book")
         }
-        
-        .navigationDestination(for: String.self) { destination in
-            if destination == "preview" {
-                PDFPreviewView(text: viewModel.detectedText, context: viewModel.modelContext)
-            } else if destination == "scan"{
-                
-                ScannerView { result in
-                    handleScan(result)
-                }
-            }
-        }
+        //!!!MARK: - Need to fix this navigation moment
+//        .navigationDestination(for: String.self) { destination in
+//            if destination == "preview" {
+//                PDFPreviewView(text: viewModel.detectedText, context: viewModel.modelContext)
+//            } else if destination == "scan"{
+//                ScannerView { result in
+//                    handleScan(result)
+//                }
+//            }
+//        }
     }
     
     private var accessAlertView: some View {

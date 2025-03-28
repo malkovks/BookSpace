@@ -46,7 +46,7 @@ struct AlertView: View {
                     Spacer()
                 }
                 .padding()
-                closeButton
+                CircleCloseButton(cancelAction: model.cancelAction)
                     .padding()
             }
         }
@@ -63,27 +63,6 @@ struct AlertView: View {
         }
         .animation(.interactiveSpring(duration: 1), value: isShowingAlert)
         
-    }
-    
-    private var closeButton: some View {
-        HStack {
-            Spacer()
-            Button {
-                withAnimation {
-                    model.cancelAction()
-                }
-            } label: {
-                Circle()
-                    .foregroundStyle(.paperYellow)
-                    .frame(width: 40, height: 40, alignment: .center)
-                    .overlay {
-                        createImage("xmark")
-                    }
-                
-            }
-        }
-        .padding([.top,.trailing],30)
-        .shadow(radius: 2,x: 1,y: 2)
     }
     
     private var titleView: some View {
@@ -122,6 +101,7 @@ struct AlertView: View {
                     Text(model.confirmActionText)
                         .foregroundStyle(.skyBlue)
                 }
+                .frame(maxWidth: .infinity)
                 .padding()
                 .background(Color.alertRed)
                 .clipShape(.rect(cornerRadius: 24,style: .circular))
@@ -138,12 +118,14 @@ struct AlertView: View {
                     createImage("xmark.diamond.fill",primaryColor: .blue,secondaryColor: .white)
                     Text(model.cancelActionText)
                 }
+                .frame(maxWidth: .infinity)
                 .padding()
                 .background(Color.paperYellow)
                 .clipShape(.rect(cornerRadius: 24,style: .circular))
                 .shadow(radius: 2,x: 1,y: 2)
             }
         }
+        .frame(maxWidth: .infinity)
     }
 }
 

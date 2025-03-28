@@ -118,7 +118,7 @@ extension BookCollectionViewModel {
             guard !Task.isCancelled else { return }
             selectedFilter = filter
             await fetchBooks()
-        }
+        } 
     }
     
     @MainActor
@@ -127,24 +127,23 @@ extension BookCollectionViewModel {
         errorMessage = nil
         
 
-        do {
-            //query request is default
-            let response = try await api.fetchData(query: query, filter: selectedFilter)
-            books = response.items ?? []
-            print("Fetched \(books.count) books.")
-        } catch {
-            errorMessage = error.localizedDescription
-            print("Fetching failed: \(error)")
-        }
+//        do {
+//            //query request is default
+//            let response = try await api.fetchData(query: query, filter: selectedFilter)
+//            books = response.items ?? []
+//            print("Fetched \(books.count) books.")
+//        } catch {
+//            errorMessage = error.localizedDescription
+//            print("Fetching failed: \(error)")
+//        }
 //             
 //         
-//        do {
-//            
-//            try await Task.sleep(nanoseconds: 2_000_000_000) // 2 sec test request
-//        } catch {
-//            errorMessage = "Failed to simulate loading"
-//        }
-//        books = bookMockModel
+        do {
+            try await Task.sleep(nanoseconds: 2_000_000_000) // 2 sec test request
+        } catch {
+            errorMessage = "Failed to simulate loading"
+        }
+        books = bookMockModel
         
         isLoading = false
     }

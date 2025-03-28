@@ -57,13 +57,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>146</string>
+					<string>144</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>145</string>
+					<string>143</string>
 					<key>Timestamp</key>
-					<string>764537757.831076</string>
+					<string>764878478.176084</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -79,16 +79,16 @@
 			<key>text-context</key>
 			<dict>
 				<key>focused</key>
-				<string>    
+				<string>    }
 </string>
 				<key>leading</key>
-				<string>    }
-    
+				<string>        let components = color.components
+        return CGPoint(x: components.hue * size.width, y: (1 - components.brightness) * size.height)
 </string>
 				<key>trailing</key>
-				<string>    private func getInitialLocation(for color: Color, in size: CGSize) -&gt; CGPoint {
-        let uiColor = UIColor(color)
-        var hue: CGFloat = 0
+				<string>}
+
+
 </string>
 			</dict>
 			<key>type</key>
@@ -102,13 +102,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>86</string>
+					<string>74</string>
 					<key>StartingColumnNumber</key>
-					<string>0</string>
+					<string>2</string>
 					<key>StartingLineNumber</key>
-					<string>85</string>
+					<string>73</string>
 					<key>Timestamp</key>
-					<string>764761485.266982</string>
+					<string>764878357.184713</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -127,13 +127,13 @@
 				<string>                ScannerView { result in
 </string>
 				<key>leading</key>
-				<string>            } else if destination == "scan"{
-                
-</string>
+				<string>//                PDFPreviewView(text: viewModel.detectedText, context: viewModel.modelContext)
+//            } else if destination == "scan"{
+//</string>
 				<key>trailing</key>
-				<string>                    handleScan(result)
-                }
-            }
+				<string>//                    handleScan(result)
+//                }
+//            }
 </string>
 			</dict>
 			<key>type</key>

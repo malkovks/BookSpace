@@ -7,60 +7,48 @@
 
 import SwiftUI
 
-enum ColorPickerMode: CaseIterable {
-    case grid
-    case spectrum
-    case sliders
-    
-    var title: String {
-        switch self {
-        case .grid:
-            return "Grid"
-        case .spectrum:
-            return "Spectrum"
-        case .sliders:
-            return "Sliders"
-        }
-    }
-}
-
 struct CustomColorPickerView: View {
-    var handleSelectedColor: (_ color: Color) -> Void
+//    @Environment(\.dismiss) var dismiss
+    @Binding var color: Color
     
     @State private var selectedMode: ColorPickerMode = .spectrum
-    @State private var selectedColor: Color = .yellow
     @State private var opacity: Double = 1.0
     @State private var colorLocation: CGPoint = CGPoint(x: 20, y: 20)
     
     var body: some View {
-        VStack {
-            Picker("Pick a mode", selection: $selectedMode){
-                ForEach(ColorPickerMode.allCases, id: \.self) { mode in
-                    Text(mode.title).tag(mode)
+        NavigationStack {
+            VStack {
+                Picker("Pick a mode", selection: $selectedMode){
+                    ForEach(ColorPickerMode.allCases, id: \.self) { mode in
+                        Text(mode.title).tag(mode)
+                    }
                 }
-            }
-            .pickerStyle(.segmented)
-            .padding()
-            Group {
-                switch selectedMode {
-                case .grid:
-                    ColorGridView(selectedColor: $selectedColor)
-                case .spectrum:
-                    ColorSpectrumView(selectedColor: $selectedColor,opacity: $opacity)
-                case .sliders:
-                    ColorSlidersView(selectedColor: $selectedColor, opacity: $opacity)
-                }
-            }
-            .frame(height: 250)
-            
-            OpacitySlider(opacity: $opacity)
-            
-            RoundedRectangle(cornerRadius: 12)
-                .fill(selectedColor.opacity(opacity))
-                .frame(height: 50)
+                .pickerStyle(.segmented)
                 .padding()
+                Group {
+                    switch selectedMode {
+                    case .grid:
+                        ColorGridView(selectedColor: $color)
+                    case .spectrum:
+                        ColorSpectrumView(selectedColor: $color,opacity: $opacity)
+                    case .sliders:
+                        ColorSlidersView(selectedColor: $color, opacity: $opacity)
+                    }
+                }
+                .frame(height: 250)
+                
+                OpacitySlider(opacity: $opacity)
+                
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(color.opacity(opacity))
+                    .animation(.linear(duration: 0.2), value: color)
+                    .frame(height: 50)
+                    .padding()
+                    .id("colorPreview\(color.description)\(opacity)")
+            }
+            
+            .padding()
         }
-        .padding()
     }
 }
 
@@ -88,14 +76,12 @@ struct ColorSpectrumView: View {
     @Binding var opacity: Double
     @State var colorLocation: CGPoint = .zero
     
-    let spectrumImage = Image("spectrum")
-    
     var body: some View {
         GeometryReader { geometry in
             let size = geometry.size
             ZStack {
                 Rectangle()
-                    
+                
                     .fill(
                         LinearGradient(
                             gradient: Gradient(colors: (0...10).map { i in
@@ -108,51 +94,53 @@ struct ColorSpectrumView: View {
                     .clipShape(.rect(cornerRadius: 12))
                     .overlay(
                         LinearGradient(
-                            gradient: Gradient(colors: [.white, .clear, .black]),
+                            gradient: Gradient(colors: [.white.opacity(0.3), .clear, .black.opacity(0.3)]),
                             startPoint: .top,
                             endPoint: .bottom
                         )
                     )
-                    
+                
                     .gesture(DragGesture(minimumDistance: 0)
                         .onChanged { value in
                             let newX = min(max(value.location.x, 0), size.width)
                             let newY = min(max(value.location.y, 0), size.height)
+                            let newLocation = CGPoint(x: newX, y: newY)
                             
-                            colorLocation = CGPoint(x: newX, y: newY)
+                            
+                            colorLocation = newLocation
                             selectedColor = getColor(at: colorLocation, in: size)
                         }
                     )
                 
                 Circle()
-                    .fill(selectedColor)
+                    .fill(selectedColor.opacity(opacity))
+                    .animation(.linear(duration: 0.2),value: selectedColor)
                     .overlay(Circle().stroke(Color.black, lineWidth: 1))
                     .frame(width: 20, height: 20)
                     .position(colorLocation)
                     .shadow(radius: 3)
             }
             .onAppear {
-                colorLocation = getInitialLocation(for: selectedColor, in: geometry.size)
+                colorLocation = calculateLocation(for: selectedColor, in: size)
             }
         }
     }
     
     private func getColor(at point: CGPoint, in size: CGSize) -> Color {
-        let hue = point.x / size.width
-        let brightness = 1 - (point.y / size.height)
-        return Color(UIColor(hue: hue, saturation: 1, brightness: brightness, alpha: 1))
+        let normalizedX = min(max(point.x, 0), size.width) / size.width
+        let normalizedY = min(max(point.y, 0), size.height) / size.height
+        
+        return Color(
+            hue: normalizedX,
+            saturation: 1,
+            brightness: 1 - normalizedY,
+            opacity: opacity
+        )
     }
     
-    
-    private func getInitialLocation(for color: Color, in size: CGSize) -> CGPoint {
-        let uiColor = UIColor(color)
-        var hue: CGFloat = 0
-        var saturation: CGFloat = 0
-        var brightness: CGFloat = 0
-        var alpha: CGFloat = 0
-        uiColor.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
-        
-        return CGPoint(x: hue * size.width, y: (1 - brightness) * size.height)
+    private func calculateLocation(for color: Color,in size: CGSize) -> CGPoint {
+        let components = color.components
+        return CGPoint(x: components.hue * size.width, y: (1 - components.brightness) * size.height)
     }
 }
 
@@ -221,7 +209,5 @@ struct OpacitySlider: View {
 }
 
 #Preview {
-    CustomColorPickerView { color in
-        
-    }
+    CustomColorPickerView(color: .constant(.warningYellow))
 }
