@@ -18,4 +18,10 @@ extension Color {
         uiColor?.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
         return (Double(hue), Double(saturation), Double(brightness), Double(alpha))
     }
+    
+    var isLight: Bool {
+        guard let components = UIColor(self).cgColor.components else { return false }
+        let brightness = ((components[0] * 299) + (components[1] * 587) + (components[2] * 114)) / 1000
+        return brightness > 0.5
+    }
 }

@@ -57,13 +57,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>144</string>
+					<string>233</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>143</string>
+					<string>232</string>
 					<key>Timestamp</key>
-					<string>764878478.176084</string>
+					<string>764905875.482879</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -79,16 +79,16 @@
 			<key>text-context</key>
 			<dict>
 				<key>focused</key>
-				<string>    }
+				<string>}
 </string>
 				<key>leading</key>
-				<string>        let components = color.components
-        return CGPoint(x: components.hue * size.width, y: (1 - components.brightness) * size.height)
+				<string>    }
+    
 </string>
 				<key>trailing</key>
-				<string>}
+				<string>
 
-
+struct ColorSlidersView: View {
 </string>
 			</dict>
 			<key>type</key>

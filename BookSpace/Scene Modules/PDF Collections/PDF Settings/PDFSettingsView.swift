@@ -27,6 +27,7 @@ struct PDFSettingsView: View {
                             Text("Two page(book)").tag(PDFDisplayMode.twoUpContinuous)
                         }
                         .pickerStyle(.inline)
+                        .foregroundStyle(.secondary)
                     } header: {
                         Text("Display Mode")
                     }
@@ -51,6 +52,7 @@ struct PDFSettingsView: View {
                             Circle()
                                 .fill(viewModel.backgroundColor)
                                 .frame(height: 20)
+                            createImage("chevron.right",fontSize: 16,primaryColor: .secondary.opacity(0.5))
                             
                             
                         }
@@ -67,13 +69,15 @@ struct PDFSettingsView: View {
                         Button {
                             dismiss()
                         } label: {
-                            createImage("chevron.down",fontSize: 24)
+                            createImage("chevron.down",fontSize: 20)
                         }
                         
                     }
                 }
                 .navigationDestination(isPresented: $showColorPicker, destination: {
-                    CustomColorPickerView(color: $viewModel.backgroundColor)
+                    CustomColorPickerView(color: $viewModel.backgroundColor) {
+                        showColorPicker.toggle()
+                    }
                 })
             }
         }
