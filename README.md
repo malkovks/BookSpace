@@ -30,6 +30,9 @@ BookSpace is an iOS application that allows users to explore, search, and manage
 - **Read Later:**  
   Keeps track of books you plan to read in the future.
 
+- **PDF Scanner and Preview:**
+  Allow to read local PDF files and books from device and scan text with camera
+
 - **Settings:**  
   Customize your app experience.
 
@@ -39,6 +42,7 @@ BookSpace is an iOS application that allows users to explore, search, and manage
 - **SwiftData** – For local data management.
 - **NavigationStack** – For seamless navigation flow.
 - **Google Books API** – For fetching and displaying book data.
+- **VisionKit & PDFKit** - For detecting and handling PDF data
 
 ## External Resources
 
