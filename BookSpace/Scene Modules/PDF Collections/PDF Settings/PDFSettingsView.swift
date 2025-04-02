@@ -27,7 +27,6 @@ struct PDFSettingsView: View {
                             Text("Two page(book)").tag(PDFDisplayMode.twoUpContinuous)
                         }
                         .pickerStyle(.inline)
-                        .foregroundStyle(.secondary)
                     } header: {
                         Text("Display Mode")
                     }

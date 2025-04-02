@@ -22,6 +22,9 @@ struct PDFViewerView: View {
             }
             navigationView
             toolView
+            if viewModel.isSearchPresented {
+                searchView
+            }
         }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
@@ -34,6 +37,15 @@ struct PDFViewerView: View {
             PDFSettingsView()
                 .environmentObject(viewModel.settings)
         }
+    }
+    
+    private var searchView: some View {
+        PDFSearchView(pdfView: $viewModel.pdfView,onClose: {
+            viewModel.isSearchPresented.toggle()
+        })
+            .padding(.top, 40)
+            .frame(maxHeight: .infinity)
+            .ignoresSafeArea(.all)
     }
     
     private var thumbnailView: some View {
@@ -99,6 +111,7 @@ struct PDFViewerView: View {
             .padding(.bottom,20)
         }
         .opacity(viewModel.settings.displayAsBook ? 1 : 0)
+        .opacity(viewModel.isSearchPresented ? 0 : 1)
 
     }
     
