@@ -99,6 +99,23 @@ struct RootView: View {
             PDFLibraryView(viewModel: PDFLibraryViewModel(modelContext: sharedModelContainer.mainContext)) {
                 rightButtons = $0
             }
+        case .statistics:
+            CircleStatView(viewModel: CircleStatViewModel(bookManager: BooksDataManager(context: sharedModelContainer.mainContext))) {
+                rightButtons = $0
+            } navigate: {
+                navigateToSelectedCategory($0)
+            }
+        }
+    }
+    
+    private func navigateToSelectedCategory(_ category: BookStat.BookCategory){
+        switch category {
+        case .favorite:
+            coordinator.selectedCategory = .savedBooks
+        case .planned:
+            coordinator.selectedCategory = .readLater
+        case .read:
+            break
         }
     }
 }

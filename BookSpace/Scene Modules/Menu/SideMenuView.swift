@@ -11,6 +11,7 @@ enum SideMenuCategories: String, CaseIterable, Identifiable {
     var id: String { self.rawValue }
     
     case main
+    case statistics
     case savedBooks
     case readLater
     case pdfLibrary
@@ -28,6 +29,8 @@ enum SideMenuCategories: String, CaseIterable, Identifiable {
             return "Read Later"
         case .pdfLibrary:
             return "My Files"
+        case .statistics:
+            return "Statistics"
         }
     }
     
@@ -43,6 +46,8 @@ enum SideMenuCategories: String, CaseIterable, Identifiable {
             return Image(systemName: "bookmark.fill")
         case .pdfLibrary:
             return Image(systemName: "document.fill")
+        case .statistics:
+            return Image(systemName: "chart.bar.xaxis")
         }
     }
 }

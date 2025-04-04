@@ -39,16 +39,16 @@ class SavedBooks: ObservableObject {
         self._description = book.volumeInfo.description ?? ""
         self.authors = book.volumeInfo.authors?.joined(separator: ", ") ?? ""
         self.category = book.volumeInfo.categories?.joined(separator: ", ") ?? ""
-        self.language = book.volumeInfo.language  ?? ""
+        self.language = book.volumeInfo.language
         self.publisher = book.volumeInfo.publisher ?? ""
         self.publishedDate = book.volumeInfo.publishedDate ?? ""
-        self.pagesCount = book.volumeInfo.pageCount  ?? 0
-        self.maturityRating = book.volumeInfo.maturityRating  ?? ""
+        self.pagesCount = book.volumeInfo.pageCount
+        self.maturityRating = book.volumeInfo.maturityRating
         self.averageRating = book.volumeInfo.averageRating ?? 0
         self.ratingsCount = book.volumeInfo.ratingsCount ?? 0
-        self.storeLink = book.volumeInfo.canonicalVolumeLink ?? ""
-        self.marketLink = book.accessInfo.webReaderLink ?? ""
-        self.coverURL = book.volumeInfo.imageLinks.thumbnail ?? ""
+        self.storeLink = book.volumeInfo.canonicalVolumeLink
+        self.marketLink = book.accessInfo.webReaderLink
+        self.coverURL = book.volumeInfo.imageLinks.thumbnail
         self.createdAt = Self.currentDateInLocalTimeFormat()
     }
     

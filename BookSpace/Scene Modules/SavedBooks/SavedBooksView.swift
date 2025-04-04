@@ -13,12 +13,12 @@ struct SavedBooksView: View {
     @StateObject private var shareManager = ShareManager()
     
     var updateRightButtons: (_ buttons: AnyView) -> Void
-    var navigateToBokCollection: () -> Void
+    var navigateToBookCollection: () -> Void
     
     init(viewModel: SavedBooksViewModel, updateRightButtons: @escaping (_: AnyView) -> Void, navigateToBookCollection: @escaping () -> Void) {
         self._viewModel = StateObject(wrappedValue: viewModel)
         self.updateRightButtons = updateRightButtons
-        self.navigateToBokCollection = navigateToBookCollection
+        self.navigateToBookCollection = navigateToBookCollection
     }
 
     var body: some View {
@@ -114,7 +114,7 @@ struct SavedBooksView: View {
                 .italic()
                 .font(.largeTitle)
             Button {
-                navigateToBokCollection()
+                navigateToBookCollection()
             } label: {
                 Label("Go to book collections", systemImage: "book.pages")
                     .foregroundStyle(.black)
