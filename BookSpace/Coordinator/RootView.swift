@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import Combine
 
 struct RootView: View {
     var sharedModelContainer: ModelContainer = {
@@ -20,6 +21,7 @@ struct RootView: View {
     @StateObject private var coordinator = AppCoordinator()
     @State private var rightButtons: AnyView = AnyView(EmptyView())
     @State private var isNavigationBarHidden: Bool = false
+    @State private var cancellable = Set<AnyCancellable>()
     
     var body: some View {
         NavigationStack {
@@ -109,14 +111,19 @@ struct RootView: View {
     }
     
     private func navigateToSelectedCategory(_ category: BookStat.BookCategory){
-        switch category {
-        case .favorite:
-            coordinator.selectedCategory = .savedBooks
-        case .planned:
-            coordinator.selectedCategory = .readLater
-        case .read:
-            break
-        }
+        Just(())
+            .delay(for: .seconds(0.5), scheduler: RunLoop.main)
+            .sink { _ in
+                switch category {
+                case .favorite:
+                    coordinator.selectedCategory = .savedBooks
+                case .planned:
+                    coordinator.selectedCategory = .readLater
+                case .read:
+                    break
+                }
+            }
+            .store(in: &cancellable)
     }
 }
 

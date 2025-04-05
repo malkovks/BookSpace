@@ -24,10 +24,6 @@ extension View {
         }
     }
     
-    func backgroundBlurEffect(style: UIBlurEffect.Style = .systemThickMaterialLight) -> some View {
-        return background(BlurView(style: style)) 
-    }
-    
     func border(width: CGFloat, edges: [Edge], color: Color = .black) -> some View {
         overlay(EdgeBorder(width: width, edges: edges)).foregroundStyle(color)
     }

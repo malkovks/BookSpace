@@ -13,6 +13,8 @@ struct CircleStatView: View {
     
     var updateRightButtons: (_ buttons: AnyView) -> Void
     var navigateToSelectedCategory: (_ category: BookStat.BookCategory) -> Void
+    @State private var selectedCategory: BookStat.BookCategory?
+    @State private var isFilterOpened: Bool = false
     
     init(viewModel: CircleStatViewModel,  updateRightButtons: @escaping (_: AnyView) -> Void, navigate: @escaping (_: BookStat.BookCategory) -> Void) {
         self._viewModel = StateObject(wrappedValue: viewModel)
@@ -23,37 +25,50 @@ struct CircleStatView: View {
     
     var body: some View {
         NavigationStack(path: $viewModel.navigationPath) {
-            ScrollView {
-                VStack {
-                    
-                    if viewModel.isLoading {
-                        ProgressView()
-                            .scaleEffect(1.5)
-                    } else {
-                        BooksPieChartView(stats: viewModel.stats, navigateToCategory: navigateToSelectedCategory)
+            ZStack(alignment: .center){
+                ScrollView {
+                    VStack(alignment: .center) {
+                        if viewModel.isLoading {
+                            Spacer()
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .black))
+                                .scaleEffect(1.5)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity,alignment: .center)
+                            Spacer()
+                        } else {
+                            BooksPieChartView(
+                                stats: viewModel.filteredStats,
+                                navigateToCategory: navigateToSelectedCategory,
+                                selectedCategory: $selectedCategory)
                             .frame(height: 400)
-                            .padding(.top, 90)
+                            
+                            Spacer()
+                        }
                     }
-                    Spacer()
                 }
+                .frame(maxHeight: .infinity)
+                .padding(.top, 80)
             }
         }
         .onAppear {
             updateRightButtons(AnyView(navigationView))
         }
+        .fullScreenCover(isPresented: $isFilterOpened, content: {
+            FilterStatView(viewModel: viewModel)
+        })
+        
         .task {
-            await viewModel.fetchBoksStats()
+            await viewModel.fetchBooksStats()
         }
     }
     
     private var navigationView: some View {
         HStack {
             Button {
-                print("start sorting stats")
+                isFilterOpened.toggle()
             } label: {
                 createImage("chart.pie.fill")
             }
-
         }
     }
 }
@@ -61,7 +76,7 @@ struct CircleStatView: View {
 struct BooksPieChartView: View {
     let stats: [BookStat]
     var navigateToCategory: (BookStat.BookCategory) -> Void
-    @State private var selectedCategory: BookStat.BookCategory?
+    @Binding var selectedCategory: BookStat.BookCategory?
     @State private var animationProgress: Double = 0
     
     var body: some View {
@@ -74,19 +89,7 @@ struct BooksPieChartView: View {
             }
             
         }
-//        .background(
-//            NavigationLink(
-//                destination: destinationView,
-//                isActive: <#T##Binding<Bool>#>,
-//                label: <#T##() -> View#>
-//            )
-//        )
     }
-    
-//    @ViewBuilder
-//    private var destinationView: some View {
-//        navigateToCategory(self.selectedCategory ?? .favorite)
-//    }
     
     private var emptyCircle: some View {
         ZStack {
@@ -102,14 +105,20 @@ struct BooksPieChartView: View {
     private var pieCharts: some View {
         ZStack {
             ForEach(stats) { stat in
-                PieSegment(data: stat)
-                    .rotationEffect(.degrees(-90))
-                    .opacity(animationProgress)
-                    .animation(
-                        .easeInOut(duration: 0.5)
-                        .delay(0.1 * Double(stats.firstIndex(where: { $0.id == stat.id }) ?? 0)),
-                        value: animationProgress
-                        )
+                PieSegment(
+                    data: stat,
+                    isSelected: selectedCategory == stat.category,
+                    onSelect: {
+                        selectedCategory = stat.category
+                        navigateToCategory(stat.category)
+                    }
+                )
+                .opacity(animationProgress)
+                .animation(
+                    .easeInOut(duration: 0.5)
+                    .delay(0.1 * Double(stats.firstIndex(where: { $0.id == stat.id }) ?? 0)),
+                    value: animationProgress
+                )
             }
         }
         .frame(width: 200, height: 200)
@@ -122,34 +131,9 @@ struct BooksPieChartView: View {
     private var legendView: some View {
         VStack(alignment: .leading, spacing: 8) {
             ForEach(stats) { stat in
-                HStack {
-                    Circle()
-                        .fill(stat.color)
-                        .frame(width: 16, height: 16)
-                    
-                    VStack(alignment: .leading) {
-                        Text(stat.category.title)
-                            .font(.subheadline)
-                        
-                        Text("\(stat.count) books (\(Int(stat.percentage * 100))%)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    Spacer()
-                    
-                    Image(systemName: "chevron.right")
-                        .foregroundColor(.gray)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(selectedCategory == stat.category ? stat.color.opacity(0.2) : Color.clear)
-                )
-                .contentShape(Rectangle())
-                .onTapGesture {
+                LegendRowView(stat: stat, isSelected: selectedCategory == stat.category) {
                     selectedCategory = stat.category
+                    navigateToCategory(stat.category)
                 }
             }
         }
@@ -157,73 +141,6 @@ struct BooksPieChartView: View {
     }
 }
 
-struct PieSegment: View {
-    let data: BookStat
-    @State private var isSelected = false
-    
-    var body: some View {
-        GeometryReader { geometry in
-            let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
-            let radius = min(geometry.size.width, geometry.size.height) / 2
-            
-            Path { path in
-                path.move(to: center)
-                path.addArc(
-                    center: center,
-                    radius: radius,
-                    startAngle: data.angleRange.start,
-                    endAngle: data.angleRange.end,
-                    clockwise: false)
-                path.closeSubpath()
-                    
-            }
-            .fill(data.color)
-            .overlay {
-                Path { path in
-                    path.move(to: center)
-                    path.addArc(
-                        center: center,
-                        radius: radius,
-                        startAngle: data.angleRange.start,
-                        endAngle: data.angleRange.end,
-                        clockwise: false)
-                    path.closeSubpath()
-                }
-                .stroke(Color.black,lineWidth: isSelected ? 4 : 2)
-            }
-            .scaleEffect(isSelected ? 1.05 : 1.0)
-            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isSelected)
-            .onTapGesture {
-                isSelected = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
-                    isSelected = false
-                })
-            }
-            .overlay {
-                percentageText(in: geometry)
-                    
-            }
-        }
-        .aspectRatio(1, contentMode: .fit)
-    }
-    
-    @ViewBuilder private func percentageText(in geometry: GeometryProxy) -> some View {
-        let radius = min(geometry.size.width, geometry.size.height) / 2
-        let middleAngle = (data.angleRange.start + data.angleRange.end) / 2
-        let textRadius = radius * 0.7
-        
-        let x = textRadius * cos(CGFloat(middleAngle.radians))
-        let y = textRadius * sin(CGFloat(middleAngle.radians))
-        
-        Text("\(Int(data.percentage * 100))%")
-            .font(.system(size: min(radius / 5, 14), weight: .bold))
-            .foregroundColor(.white)
-            .shadow(color: .black, radius: 1)
-            .frame(width: 40, height: 20)
-            .background(Color.black.opacity(0.3))
-            .clipShape(RoundedRectangle(cornerRadius: 5))
-            .position(x: geometry.size.width / 2 + x, y: geometry.size.height / 2 + y)
-            .opacity(data.percentage > 0.15 ? 1 : 0) 
-    }
 
-}
+
+

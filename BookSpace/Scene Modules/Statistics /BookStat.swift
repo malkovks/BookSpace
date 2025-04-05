@@ -44,6 +44,17 @@ extension BookStat {
                 return "Completed"
             }
         }
+        
+        var icon: String {
+            switch self {
+            case .favorite:
+                return "heart.fill"
+            case .planned:
+                return "bookmark.fill"
+            case .read:
+                return "checkmark"
+            }
+        }
     }
     
     static func fromStats(favorites: Int, planned: Int, read: Int) -> [BookStat] {
