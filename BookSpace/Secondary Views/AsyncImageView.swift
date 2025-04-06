@@ -6,37 +6,52 @@
 // Copyright (c) 2024 Malkov Konstantin . All rights reserved.
 
 import SwiftUI
+import Combine
 
 struct AsyncImageView: View {
     let url: String
     @State private var image: UIImage? = nil
     @State private var isLoading: Bool = true
+    @State private var generatedImage: UIImage?
+    @State private var cancellable = Set<AnyCancellable>()
     
     var loadedImage: ((UIImage) -> Void?)? = nil
     
     var body: some View {
-        Group {
-            if isLoading {
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle())
-                    .tint(.black)
-                    .scaleEffect(1.5)
-            } else if let image = image {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundStyle(.skyBlue)
-                
-            } else {
-                Image(systemName: "photo")
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundStyle(.gray)
+        GeometryReader { proxy in
+            Group {
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .tint(.black)
+                        .scaleEffect(1.5)
+                } else if let image = image {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(.skyBlue)
+                    
+                } else {
+                    Image(uiImage: generatedImage!)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(.skyBlue)
+                }
+            }
+            .onAppear {
+                loadImage()
+                generateImage(size: proxy.size)
             }
         }
-        .onAppear {
-            loadImage()
-        }
+    }
+    
+    private func generateImage(size: CGSize){
+        BookCoverGenerator.shared.generateCover(title: "Random name", author: "Test author", size: size)
+            .sink { image in
+                loadedImage?(image.asUIImage())
+                generatedImage = image.asUIImage()
+            }
+            .store(in: &cancellable)
     }
     
     private func loadImage(){
