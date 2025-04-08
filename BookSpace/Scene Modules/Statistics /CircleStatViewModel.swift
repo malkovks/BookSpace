@@ -9,7 +9,6 @@ import SwiftUI
 
 @Observable
 class CircleStatViewModel: ObservableObject {
-    var navigationPath = NavigationPath()
     var isLoading: Bool = true
     var stats: [BookStat] = []
     var filteredStats: [BookStat] = []

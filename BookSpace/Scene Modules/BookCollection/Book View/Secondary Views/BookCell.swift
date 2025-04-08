@@ -39,7 +39,9 @@ struct BookCell: View {
     var body: some View {
         ZStack(alignment: .top) {
             VStack {
-                AsyncImageView(url: book.volumeInfo.imageLinks.thumbnail)
+                AsyncImageView(
+                    url: book.volumeInfo.imageLinks.thumbnail,
+                    title: book.volumeInfo.title, author: nil)
                     .frame(width: 100, height: 150)
                     .clipShape(.rect(cornerRadius: 10))
                 Spacer(minLength: 5)

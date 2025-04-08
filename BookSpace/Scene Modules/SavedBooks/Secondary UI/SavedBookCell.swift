@@ -39,7 +39,7 @@ struct SavedBookCell: View {
     var body: some View {
         GeometryReader { geometry in
             HStack(spacing: 10) {
-                AsyncImageView(url: book.coverURL)
+                AsyncImageView(url: book.coverURL,title: book.title,author: book.authors)
                     .frame(width: geometry.size.width / 3, height: max(100, geometry.size.height - 30))
                 infoView
             }

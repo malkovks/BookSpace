@@ -41,7 +41,7 @@ struct BookDetailView: View {
                 .ignoresSafeArea()
             List {
                 HStack {
-                    AsyncImageView(url: book.volumeInfo.imageLinks.thumbnail,loadedImage: { image in
+                    AsyncImageView(url: book.volumeInfo.imageLinks.thumbnail,title: book.volumeInfo.title,author: book.volumeInfo.authors?.joined(separator: ",") ?? "",loadedImage: { image in
                         let image = Image(uiImage: image)
                         viewModel.extractColor(from: image)
                     })

@@ -19,6 +19,11 @@ struct PDFLibraryView: View {
         self.updateRightButtons = updateRightButtons
     }
     
+    @State private var importedBook: ImportedBook?
+    @State private var error: Error?
+    @State private var showImportBookView: Bool = false
+    @State private var showTextView: Bool = false
+    
     private let columns = [
         GridItem(.flexible(), spacing: 20),
         GridItem(.flexible(), spacing: 20)
@@ -50,11 +55,25 @@ struct PDFLibraryView: View {
             alertView
         })
         
+        .sheet(isPresented: $showTextView, content: {
+            BookPageView(importedBook: importedBook,error: self.error)
+        })
+        
+        .sheet(isPresented: $showImportBookView, content: {
+            ImportBookView(importedBook: $importedBook, isPresented: $showImportBookView) { error in
+                self.error = error
+                self.showImportBookView.toggle()
+                sleep(1)
+                self.showTextView.toggle()
+            }
+        })
+        
         .sheet(isPresented: $viewModel.showingPicker) {
             PDFPickerView {
                 viewModel.savedPDF(url: $0)
             }
         }
+        
         .alert("Enter the text",isPresented: $viewModel.isChangeName) {
             TextField("Enter the text", text: $viewModel.textFieldName)
             Button("Update") {
@@ -109,6 +128,8 @@ struct PDFLibraryView: View {
     
     private var navigationButtons: some View {
         HStack {
+            
+            
             Button {
                 withAnimation {
                     viewModel.showingPicker = true
@@ -117,6 +138,15 @@ struct PDFLibraryView: View {
                 Label("Add new file", systemImage: "plus")
                     .tint(.black)
             }
+            
+            Button {
+                showImportBookView.toggle()
+            } label: {
+                createImage("plus",primaryColor: .green)
+            }
+
+            
+            /*
             Button {
                 Task {
                     await cameraManager.requestAccess(completion: { result in
@@ -134,6 +164,7 @@ struct PDFLibraryView: View {
             } label: {
                 createImage("camera.viewfinder",primaryColor: .alertRed,secondaryColor: .black)
             }
+             */
         }
     }
     

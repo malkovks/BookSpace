@@ -13,7 +13,7 @@ final class BookCoverGenerator {
     
     private init() {}
     
-    func generateCover(title: String, author: String?, size: CGSize = CGSize(width: 200, height: 300)) -> AnyPublisher<Image,Never> {
+    func generateCover(title: String, author: String?, size: CGSize = CGSize(width: 200, height: 300)) -> AnyPublisher<UIImage,Never> {
         return Future { promise in
             let image = self.createImage(title: title, author: author, size: size)
             promise(.success(image))
@@ -22,10 +22,10 @@ final class BookCoverGenerator {
         .eraseToAnyPublisher()
     }
     
-    private func createImage(title: String, author: String?, size: CGSize) -> Image {
+    private func createImage(title: String, author: String?, size: CGSize) -> UIImage {
         let renderer = UIGraphicsImageRenderer(size: size)
         
-        let uiimage = renderer.image { context in
+        return renderer.image { context in
             let rect = CGRect(origin: .zero, size: size)
             let ctx = context.cgContext
             
@@ -83,7 +83,5 @@ final class BookCoverGenerator {
                 authorString.draw(in: authorRect)
             }
         }
-        return Image(uiImage: uiimage)
     }
 }
-

@@ -24,37 +24,44 @@ struct CircleStatView: View {
     
     
     var body: some View {
-        NavigationStack(path: $viewModel.navigationPath) {
+        NavigationStack() {
             ZStack(alignment: .center){
-                ScrollView {
-                    VStack(alignment: .center) {
-                        if viewModel.isLoading {
-                            Spacer()
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .black))
-                                .scaleEffect(1.5)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity,alignment: .center)
-                            Spacer()
-                        } else {
+                Color.secondary
+                    .opacity(0.4)
+                    .ignoresSafeArea()
+                if viewModel.isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .black))
+                        .scaleEffect(1.5)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity,alignment: .center)
+                } else {
+                    ScrollView {
+                        VStack(alignment: .center) {
                             BooksPieChartView(
-                                stats: viewModel.filteredStats,
-                                navigateToCategory: navigateToSelectedCategory,
-                                selectedCategory: $selectedCategory)
+                                stats: $viewModel.filteredStats,
+                                selectedCategory: $selectedCategory,
+                                navigateToCategory: navigateToSelectedCategory)
                             .frame(height: 400)
                             
                             Spacer()
                         }
+                        
                     }
+                    .padding(.top, 80)
+                    .frame(maxHeight: .infinity)
                 }
-                .frame(maxHeight: .infinity)
-                .padding(.top, 80)
             }
         }
         .onAppear {
             updateRightButtons(AnyView(navigationView))
         }
+        //график не меняется после обновления фильтра. Исправить
         .fullScreenCover(isPresented: $isFilterOpened, content: {
-            FilterStatView(viewModel: viewModel)
+            FilterStatView(viewModel: viewModel) {
+//                Task {
+//                    await viewModel.fetchBooksStats()
+//                }
+            }
         })
         
         .task {
@@ -74,9 +81,9 @@ struct CircleStatView: View {
 }
 
 struct BooksPieChartView: View {
-    let stats: [BookStat]
-    var navigateToCategory: (BookStat.BookCategory) -> Void
+    @Binding var stats: [BookStat]
     @Binding var selectedCategory: BookStat.BookCategory?
+    var navigateToCategory: (BookStat.BookCategory) -> Void
     @State private var animationProgress: Double = 0
     
     var body: some View {

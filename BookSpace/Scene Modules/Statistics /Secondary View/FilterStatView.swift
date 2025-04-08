@@ -10,18 +10,23 @@ import SwiftUI
 struct FilterStatView: View {
     
     @Bindable var viewModel: CircleStatViewModel
+    var onDismiss: (() -> Void)
     @Environment(\.dismiss) var dismiss
+    
     
     var body: some View {
         ZStack {
-            BlurView(style: .regular)
+            BlurView(style: .light)
+                .opacity(0.6)
                 .onTapGesture {
                     dismiss()
+                    onDismiss()
                 }
             GeometryReader { proxy in
                 HStack(alignment: .top) {
                     Button {
                         dismiss()
+                        onDismiss()
                     } label: {
                         createImage("xmark")
                     }

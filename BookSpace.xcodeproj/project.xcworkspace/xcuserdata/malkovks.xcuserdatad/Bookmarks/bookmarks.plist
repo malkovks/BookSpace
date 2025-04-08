@@ -102,13 +102,13 @@ struct ColorSlidersView: View {
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>74</string>
+					<string>93</string>
 					<key>StartingColumnNumber</key>
-					<string>2</string>
+					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>73</string>
+					<string>92</string>
 					<key>Timestamp</key>
-					<string>764878357.184713</string>
+					<string>765796776.527773</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -124,12 +124,12 @@ struct ColorSlidersView: View {
 			<key>text-context</key>
 			<dict>
 				<key>focused</key>
-				<string>                ScannerView { result in
+				<string>//                ScannerView { result in
 </string>
 				<key>leading</key>
 				<string>//                PDFPreviewView(text: viewModel.detectedText, context: viewModel.modelContext)
 //            } else if destination == "scan"{
-//</string>
+</string>
 				<key>trailing</key>
 				<string>//                    handleScan(result)
 //                }

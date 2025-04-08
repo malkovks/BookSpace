@@ -86,7 +86,7 @@ struct ReadLaterCell: View {
     }
     
     private var coverImage: some View {
-        AsyncImageView(url: book.coverURL)
+        AsyncImageView(url: book.coverURL,title: book.title,author: book.authors)
             .frame(maxWidth: isEditing ? 0 : 80, maxHeight: isEditing ? 0 : 80,alignment: .leading)
             .isHidden(isEditing)
             .padding([.vertical], 10)
