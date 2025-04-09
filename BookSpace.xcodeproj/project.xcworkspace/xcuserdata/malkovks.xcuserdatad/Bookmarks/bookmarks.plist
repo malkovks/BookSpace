@@ -102,13 +102,13 @@ struct ColorSlidersView: View {
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>93</string>
+					<string>110</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>92</string>
+					<string>109</string>
 					<key>Timestamp</key>
-					<string>765796776.527773</string>
+					<string>765896628.502472</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>

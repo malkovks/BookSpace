@@ -20,6 +20,12 @@ final class BookImportManager {
     private init() {}
     
     func importBook(from url: URL) throws -> ImportedBook {
+        guard url.startAccessingSecurityScopedResource() else {
+            throw ImportError.noAccessToFileManager
+        }
+        
+        defer { url.stopAccessingSecurityScopedResource() }
+        
         let fileExtension = url.pathExtension.lowercased()
         
         switch fileExtension {
@@ -66,7 +72,7 @@ private extension BookImportManager {
     func unzipFile(at sourceURL: URL, to destinationURL: URL) throws {
         let fileManager = FileManager()
         guard fileManager.fileExists(atPath: sourceURL.path) else {
-            throw ImportError.parsingError
+            throw ImportError.fileDoesNotExist
         }
         
         if !fileManager.fileExists(atPath: destinationURL.path) {
@@ -96,7 +102,7 @@ private extension BookImportManager {
     
     func parseDocxContent(_ data: Data) throws -> String {
         guard let xmlString = String(data: data, encoding: .utf8) else {
-            throw ImportError.parsingError
+            throw ImportError.errorDecodingDocx
         }
         
         var text = xmlString
@@ -146,7 +152,7 @@ private extension BookImportManager {
         
         let containerData = try Data(contentsOf: containerPath)
         guard let rootFilePath = try findRootFilePath(in: containerData) else {
-            throw ImportError.parsingError
+            throw ImportError.fileDoesNotExist
         }
         
         let rootFileURL = tempDir.appendingPathComponent(rootFilePath)
@@ -160,7 +166,7 @@ private extension BookImportManager {
     
     func findRootFilePath(in containerData: Data) throws -> String? {
         guard let containerString = String(data: containerData, encoding: .utf8) else {
-            throw ImportError.parsingError
+            throw ImportError.errorDecodingEpub
         }
         
         if let startRange = containerString.range(of: "full-path=\""),
@@ -172,7 +178,7 @@ private extension BookImportManager {
     
     func parseEPUBMetadata(from opfData: Data) throws -> (title: String, author: String?){
         guard let opfString = String(data: opfData, encoding: .utf8) else {
-            throw ImportError.parsingError
+            throw ImportError.errorDecodingEpub
         }
         
         var title: String = "Unknown"
@@ -192,54 +198,63 @@ private extension BookImportManager {
     
     func parseEPUBContent(rootFileDir: URL, rootFileData: Data) throws -> String {
         guard let opfString = String(data: rootFileData, encoding: .utf8) else {
-            throw ImportError.parsingError
+            throw ImportError.errorDecodingEpub
         }
         
         var content = ""
-        var manifestItem = [String: String]()
+        var manifestItem: [String: String] = [:]
         
-        if let manifestStart = opfString.range(of: "<manifest>"),
+        // 📑 Читаем <manifest>
+        if let manifestStart = opfString.range(of: "<manifest"),
            let manifestEnd = opfString.range(of: "</manifest>") {
-            let manifestContent = String(opfString[manifestStart.upperBound..<manifestEnd.lowerBound])
-            
+            let manifestContent = String(opfString[manifestStart.lowerBound..<manifestEnd.upperBound])
             let itemPattern = "<item[^>]+id=\"([^\"]+)\"[^>]+href=\"([^\"]+)\"[^>]*>"
-            let regex = try NSRegularExpression(pattern: itemPattern, options: [])
+            let regex = try NSRegularExpression(pattern: itemPattern)
             let matches = regex.matches(in: manifestContent, range: NSRange(manifestContent.startIndex..., in: manifestContent))
-            
             for match in matches {
-                if match.numberOfRanges >= 3,
-                   let idRange = Range(match.range(at: 1), in: manifestContent),
-                   let hrefRange = Range(match.range(at: 2),in: manifestContent) {
+                if let idRange = Range(match.range(at: 1), in: manifestContent),
+                   let hrefRange = Range(match.range(at: 2), in: manifestContent) {
                     let id = String(manifestContent[idRange])
                     let href = String(manifestContent[hrefRange])
                     manifestItem[id] = href
                 }
             }
+        } else {
+            throw ImportError.manifestNotFound
         }
         
-        if let spineStart = opfString.range(of: "<spine[^>]*>"),
+        // 📚 Читаем <spine>
+        if let spineStart = opfString.range(of: "<spine"),
            let spineEnd = opfString.range(of: "</spine>") {
-            let spineContent = String(opfString[spineStart.upperBound..<spineEnd.lowerBound])
-            let itemRefPattern = "<itemref[^>]+idref=\"([^\"]+)\"[^>]*/>"
-            let regex = try NSRegularExpression(pattern: itemRefPattern, options: [])
-            let matches = regex.matches(in: spineContent, range: NSRange(spineContent.startIndex...,in: spineContent))
+            let spineContent = String(opfString[spineStart.lowerBound..<spineEnd.upperBound])
+            let itemRefPattern = "<itemref[^>]+idref=\"([^\"]+)\"[^>]*/?>"
+            let regex = try NSRegularExpression(pattern: itemRefPattern)
+            let matches = regex.matches(in: spineContent, range: NSRange(spineContent.startIndex..., in: spineContent))
             for match in matches {
-                if match.numberOfRanges >= 2,
-                   let idRefRange = Range(match.range(at: 1), in: spineContent) {
+                if let idRefRange = Range(match.range(at: 1), in: spineContent) {
                     let idRef = String(spineContent[idRefRange])
-                    
                     if let href = manifestItem[idRef] {
                         let contentPath = rootFileDir.appendingPathComponent(href)
-                        if let htmlContent = try? String(contentsOf: contentPath, encoding: .utf8) {
+                        print("📄 Loading: \(contentPath.path)")
+                        
+                        if FileManager.default.fileExists(atPath: contentPath.path),
+                           let data = try? Data(contentsOf: contentPath),
+                           let htmlContent = String(data: data, encoding: .utf8) ??
+                                              String(data: data, encoding: .isoLatin1) ??
+                                              String(data: data, encoding: .windowsCP1252) {
                             let text = htmlContent
-                                .replacingOccurrences(of: "<[^>]+>", with: " ",options: .regularExpression)
-                                .replacingOccurrences(of: "\\s+", with: " " ,options: .regularExpression)
+                                .replacingOccurrences(of: "<[^>]+>", with: " ", options: .regularExpression)
+                                .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
                                 .trimmingCharacters(in: .whitespacesAndNewlines)
                             content += text + "\n\n"
+                        } else {
+                            print("⚠️ Can't read or decode: \(contentPath.lastPathComponent)")
                         }
                     }
                 }
             }
+        } else {
+            throw ImportError.spineNotFound
         }
         
         guard !content.isEmpty else {

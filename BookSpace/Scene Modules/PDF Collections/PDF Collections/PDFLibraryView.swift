@@ -7,6 +7,12 @@
 
 import SwiftUI
 
+enum BookImportSheet {
+    case `import`
+    case preview
+    case none
+}
+
 struct PDFLibraryView: View {
     @StateObject private var viewModel: PDFLibraryViewModel
     @StateObject private var settingViewModel: PDFSettingsViewModel = .init()
@@ -19,10 +25,9 @@ struct PDFLibraryView: View {
         self.updateRightButtons = updateRightButtons
     }
     
-    @State private var importedBook: ImportedBook?
-    @State private var error: Error?
-    @State private var showImportBookView: Bool = false
-    @State private var showTextView: Bool = false
+    @State private var selectedBook: ImportedBook?
+    @State private var showImportBook: Bool = false
+    @State private var showTextView : Bool = false
     
     private let columns = [
         GridItem(.flexible(), spacing: 20),
@@ -55,17 +60,29 @@ struct PDFLibraryView: View {
             alertView
         })
         
-        .sheet(isPresented: $showTextView, content: {
-            BookPageView(importedBook: importedBook,error: self.error)
+        .sheet(isPresented: $showImportBook, content: {
+            ImportBookView(isPresented: $showImportBook)
+            { error in
+                print("❌ Ошибка импорта: \(error.localizedDescription)")
+            } onBook: { book in
+                print("Book received successfully")
+                showImportBook = false
+                selectedBook = book
+                showTextView = true
+            }
+            
         })
         
-        .sheet(isPresented: $showImportBookView, content: {
-            ImportBookView(importedBook: $importedBook, isPresented: $showImportBookView) { error in
-                self.error = error
-                self.showImportBookView.toggle()
-                sleep(1)
-                self.showTextView.toggle()
+        .sheet(isPresented: $showTextView, content: {
+            if let selectedBook {
+                BookPageView(importedBook: selectedBook)
+            } else {
+                Text("No book was selected")
             }
+        })
+        
+        .sheet(item: $selectedBook, content: { book in
+            BookPageView(importedBook: book)
         })
         
         .sheet(isPresented: $viewModel.showingPicker) {
@@ -135,14 +152,17 @@ struct PDFLibraryView: View {
                     viewModel.showingPicker = true
                 }
             } label: {
-                Label("Add new file", systemImage: "plus")
+                Label("Add PDF", systemImage: "plus")
                     .tint(.black)
             }
             
             Button {
-                showImportBookView.toggle()
+                withAnimation {
+                    showImportBook = true
+                }
             } label: {
-                createImage("plus",primaryColor: .green)
+                Label("Add File",systemImage: "book.pages")
+                    .tint(.skyBlue)
             }
 
             

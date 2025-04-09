@@ -30,4 +30,11 @@ enum ImportError: Error {
     case invalidDocumentStructure
     case parsingError
     case errorUnzip
+    case fileDoesNotExist
+    case errorDecodingDocx
+    case errorDecodingEpub
+    case noAccessToFileManager
+    case manifestNotFound
+    case spineNotFound
+    
 }
