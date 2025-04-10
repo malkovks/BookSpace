@@ -13,6 +13,7 @@ enum CameraAccess: Error {
     case restricted
     case notDetermined
     case unknown
+    case noAccessToVisionKit
 }
 
 class CameraAccessManager {
@@ -25,6 +26,11 @@ class CameraAccessManager {
     }
     
     func requestAccess(completion: @escaping (_ result: Result<Bool,CameraAccess>) -> Void) async {
+        guard checkVisionKitAccess() else {
+            completion(.failure(.noAccessToVisionKit))
+            return
+        }
+        
         do {
             let status = try await checkCameraAccess()
             

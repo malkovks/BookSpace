@@ -37,7 +37,7 @@ class AsyncImageViewModel : ObservableObject {
                 .setFailureType(to: Error.self)
                 .eraseToAnyPublisher()
         }
-        guard let url = URL(string: urlString) else {
+        guard let url = URL(string: urlString.replacingOccurrences(of: "http://", with: "https://")) else {
             return Fail(error: URLError(.badURL))
                 .eraseToAnyPublisher()
         }

@@ -7,13 +7,8 @@
 
 import SwiftUI
 
-enum BookImportSheet {
-    case `import`
-    case preview
-    case none
-}
-
 struct PDFLibraryView: View {
+    
     @StateObject private var viewModel: PDFLibraryViewModel
     @StateObject private var settingViewModel: PDFSettingsViewModel = .init()
     private let cameraManager = CameraAccessManager.shared
@@ -25,10 +20,6 @@ struct PDFLibraryView: View {
         self.updateRightButtons = updateRightButtons
     }
     
-    @State private var selectedBook: ImportedBook?
-    @State private var showImportBook: Bool = false
-    @State private var showTextView : Bool = false
-    
     private let columns = [
         GridItem(.flexible(), spacing: 20),
         GridItem(.flexible(), spacing: 20)
@@ -36,20 +27,7 @@ struct PDFLibraryView: View {
     
     var body: some View {
         NavigationStack(path: $viewModel.navigationPath) {
-            ZStack {
-                if viewModel.savedFiles.isEmpty {
-                    Text("No files found")
-                        .font(.largeTitle)
-                        .foregroundColor(.secondary)
-                } else {
-                    listView
-                        .navigationDestination(for: BookPDFIdentifiable.self) {
-                            PDFViewerView(pdf: $0.pdf) {
-                                viewModel.navigationPath.removeLast()
-                            }
-                        }
-                }
-            }
+            contentView
         }
         .onAppear {
             viewModel.fetchSavedFiles()
@@ -60,36 +38,52 @@ struct PDFLibraryView: View {
             alertView
         })
         
-        .sheet(isPresented: $showImportBook, content: {
-            ImportBookView(isPresented: $showImportBook)
-            { error in
-                print("❌ Ошибка импорта: \(error.localizedDescription)")
-            } onBook: { book in
-                print("Book received successfully")
-                showImportBook = false
-                selectedBook = book
-                showTextView = true
+        .sheet(item: $viewModel.activeSheet, content: { libraryType in
+            NavigationView {
+                switch libraryType {
+                case .import:
+                    ImportBookView(isPresented: $viewModel.showImportBook)
+                    { result in
+                        viewModel.handleConvertDoc(result)
+                    }
+                case .pageView(book: let book):
+                    BookPageView(importedBook: book) { isNeedToSave in
+                        print("isNeedToSave: \(isNeedToSave)")
+                    }
+                case .pdfPicker:
+                    PDFPickerView {
+                        viewModel.savedPDF(url: $0)
+                    }
+                }
+            }
+        })
+        .confirmationDialog("What to do",isPresented: $viewModel.isPresentDialog) {
+            Button("Import PDF") {
+                viewModel.activeSheet = .pdfPicker
+            }
+            Button("Import other types") {
+                viewModel.activeSheet = .import
             }
             
-        })
-        
-        .sheet(isPresented: $showTextView, content: {
-            if let selectedBook {
-                BookPageView(importedBook: selectedBook)
-            } else {
-                Text("No book was selected")
-            }
-        })
-        
-        .sheet(item: $selectedBook, content: { book in
-            BookPageView(importedBook: book)
-        })
-        
-        .sheet(isPresented: $viewModel.showingPicker) {
-            PDFPickerView {
-                viewModel.savedPDF(url: $0)
+            Button("Scan text") {
+                viewModel.handleCameraAndStartScan()
             }
         }
+        
+        .navigationDestination(for: LibraryRoute.self, destination: {
+            switch $0 {
+            case .preview:
+                PDFPreviewView(text: viewModel.detectedText, context: viewModel.modelContext)
+            case .scan:
+                ScannerView { result in
+                    viewModel.handleScan(result)
+                }
+            case .viewPDF(let book):
+                PDFViewerView(pdf: book.pdf) {
+                    viewModel.navigationPath.removeLast()
+                }
+            }
+        })
         
         .alert("Enter the text",isPresented: $viewModel.isChangeName) {
             TextField("Enter the text", text: $viewModel.textFieldName)
@@ -102,19 +96,24 @@ struct PDFLibraryView: View {
         } message: {
             Text("Please, Enter new name title of book")
         }
-        //!!!MARK: - Need to fix this navigation moment
-//        .navigationDestination(for: String.self) { destination in
-//            if destination == "preview" {
-//                PDFPreviewView(text: viewModel.detectedText, context: viewModel.modelContext)
-//            } else if destination == "scan"{
-//                ScannerView { result in
-//                    handleScan(result)
-//                }
-//            }
-//        }
+    }
+}
+
+private extension PDFLibraryView {
+    
+    var contentView: some View {
+        ZStack {
+            if viewModel.savedFiles.isEmpty {
+                Text("No files found")
+                    .font(.largeTitle)
+                    .foregroundColor(.secondary)
+            } else {
+                listView
+            }
+        }
     }
     
-    private var accessAlertView: some View {
+    var accessAlertView: some View {
         AlertView(
             isShowingAlert: $viewModel.showAlert,
             model: AlertModel(message: viewModel.alertMessage, confirmActionText: "", cancelActionText: "",hideButton: true , confirmAction: {
@@ -124,7 +123,7 @@ struct PDFLibraryView: View {
             }))
     }
     
-    private var alertView: some View {
+    var alertView: some View {
         AlertView(isShowingAlert: $viewModel.isDeleteFile, model: AlertModel(title: "Warning", message: "Do you want to delete selected item?", confirmActionText: "Delete", cancelActionText: "Cancel", confirmAction: {
             viewModel.deletePDF()
             viewModel.isDeleteFile = false
@@ -133,62 +132,18 @@ struct PDFLibraryView: View {
         }))
     }
     
-    private func handleScan(_ result: Result<String,Error>) {
-        switch result {
-        case .success(let text):
-            viewModel.detectedText = text
-            viewModel.navigationPath.append("preview")
-        case .failure(let failure):
-            print("Scanning failed: \(failure.localizedDescription)")
-        }
-    }
-    
-    private var navigationButtons: some View {
+    var navigationButtons: some View {
         HStack {
-            
-            
             Button {
-                withAnimation {
-                    viewModel.showingPicker = true
-                }
+                viewModel.isPresentDialog = true
             } label: {
-                Label("Add PDF", systemImage: "plus")
+                Label("Import", systemImage: "document.badge.plus.fill")
                     .tint(.black)
             }
-            
-            Button {
-                withAnimation {
-                    showImportBook = true
-                }
-            } label: {
-                Label("Add File",systemImage: "book.pages")
-                    .tint(.skyBlue)
-            }
-
-            
-            /*
-            Button {
-                Task {
-                    await cameraManager.requestAccess(completion: { result in
-                        DispatchQueue.main.async {
-                            switch result {
-                            case .success :
-                                viewModel.navigationPath.append("scan")
-                                viewModel.showCameraView = true
-                            case .failure(let failure):
-                                handleCameraError(failure)
-                            }
-                        }
-                    })
-                }
-            } label: {
-                createImage("camera.viewfinder",primaryColor: .alertRed,secondaryColor: .black)
-            }
-             */
         }
     }
     
-    private var listView: some View {
+    var listView: some View {
         ScrollView(.vertical) {
             LazyVGrid(columns: columns,spacing: 20) {
                 ForEach(viewModel.savedFiles, id: \.id) { file in
@@ -201,22 +156,6 @@ struct PDFLibraryView: View {
         }
         .padding(.top, 90)
         .padding(.horizontal,10)
-    }
-    
-    @MainActor
-    private func handleCameraError(_ error: CameraAccess){
-        switch error {
-        case .denied:
-            viewModel.alertMessage = "Camera access is denied"
-        case .restricted:
-            viewModel.alertMessage = "Camera access is restricted"
-        case .notDetermined:
-            viewModel.alertMessage = "Camera access not determined"
-        case .unknown:
-            viewModel.alertMessage = "Unknown error"
-        }
-        
-        viewModel.showAlert = true
     }
 }
 

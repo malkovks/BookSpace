@@ -27,7 +27,7 @@ struct ListViewCell: View {
             }
             .onTapGesture {
                 viewModel.selectedFile = file
-                viewModel.navigationPath.append(BookPDFIdentifiable(pdf: file))
+                viewModel.navigationPath.append(.viewPDF(BookPDFIdentifiable(pdf: file)))
             }
             VStack {
                 Button {

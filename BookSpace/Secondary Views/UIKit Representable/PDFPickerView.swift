@@ -20,6 +20,7 @@ struct PDFPickerView: UIViewControllerRepresentable {
         let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.pdf])
         picker.delegate = context.coordinator
         picker.allowsMultipleSelection = false
+        picker.title = "Select PDF"
         return picker
     }
     

@@ -10,8 +10,7 @@ import UniformTypeIdentifiers
 
 struct ImportBookView: UIViewControllerRepresentable {
     @Binding var isPresented: Bool
-    var onError: (Error) -> Void
-    var onBook: (_ book: ImportedBook) -> Void
+    var handler: (_ result: Result<ImportedBook,Error>) -> Void
     
     func makeCoordinator() -> Coordinator {
         Coordinator(parent: self)
@@ -20,13 +19,13 @@ struct ImportBookView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
         let types: [UTType] = [
             .plainText,
-            .pdf,
             UTType(filenameExtension: "docx")!,
             UTType(filenameExtension: "epub")!
         ]
         let picker = UIDocumentPickerViewController(forOpeningContentTypes: types)
         picker.delegate = context.coordinator
         picker.allowsMultipleSelection = false
+        picker.title = "Select file to import"
         return picker
     }
     
@@ -41,12 +40,12 @@ struct ImportBookView: UIViewControllerRepresentable {
         
         func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
             guard let url = urls.first else {
-                parent.onError(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No file selected"]))
+                parent.handler(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No file selected"])))
                 return
             }
 
             guard url.startAccessingSecurityScopedResource() else {
-                parent.onError(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Could not access file"]))
+                parent.handler(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Could not access file"])))
                 return
             }
 
@@ -58,11 +57,11 @@ struct ImportBookView: UIViewControllerRepresentable {
                         
                         Task { @MainActor in
                             self.parent.isPresented = false
-                            self.parent.onBook(book)
+                            self.parent.handler(.success(book))
                         }
                     } catch {
                         Task { @MainActor in
-                            self.parent.onError(error)
+                            self.parent.handler(.failure(error))
                         }
                     }
             }
