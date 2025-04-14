@@ -19,18 +19,18 @@ struct ColorGridView: View {
         
         
         for col in 0..<8 {
-            let step = Double(col) / 7.0  // 0..1
-            let brightness = 1.0 - 0.8 * step // от 1.0 до 0.2
+            let step = Double(col) / 7.0
+            let brightness = 1.0 - 0.8 * step
             result[0][col] = Color(hue: 0, saturation: 0, brightness: brightness)
         }
         
-        // row=1..7
+        
         
         for row in 1..<8 {
             for col in 0..<8 {
-                let hue = Double(col) / 8.0  // 0..7 => 0..0.875
+                let hue = Double(col) / 8.0
                 
-                let brightness = 1.0 - (Double(row) / 7.0) * 0.9 // 1.0..0.1
+                let brightness = 1.0 - (Double(row) / 7.0) * 0.9
                 result[row][col] = Color(hue: hue, saturation: 1.0, brightness: brightness)
             }
         }

@@ -16,7 +16,7 @@ struct RootView: View {
         return try! ModelContainer(for: schema, configurations: [modelConfiguration])
     }()
     
-    
+    @StateObject private var settings = SettingsViewModel()
     @StateObject private var networkManager = NetworkMonitor()
     @StateObject private var coordinator = AppCoordinator()
     @State private var rightButtons: AnyView = AnyView(EmptyView())
@@ -79,6 +79,7 @@ struct RootView: View {
                 isNavigationBarHidden = isHidden
             }
             .environmentObject(networkManager)
+            .environmentObject(settings)
 
         case .savedBooks:
             SavedBooksView(viewModel: SavedBooksViewModel(modelContext: sharedModelContainer.mainContext)) { buttons in
@@ -86,10 +87,12 @@ struct RootView: View {
             } navigateToBookCollection: {
                 coordinator.selectedCategory = .main
             }
+            .environmentObject(settings)
         case .settings:
             SettingsView { buttons in
                 rightButtons = AnyView(buttons)
             }
+            .environmentObject(settings)
             
         case .readLater:
             ReadLaterView(viewModel: ReadLaterViewModel(modelContext: sharedModelContainer.mainContext), updateRightButtons: { buttons in
