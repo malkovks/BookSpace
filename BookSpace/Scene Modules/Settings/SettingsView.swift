@@ -29,7 +29,6 @@ struct SettingsView: View {
                 ))
             }
         }
-        
     }
     
     private var formView: some View {

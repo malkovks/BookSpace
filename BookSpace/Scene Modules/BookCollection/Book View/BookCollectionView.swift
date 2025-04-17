@@ -11,8 +11,10 @@ import SwiftData
 
 struct BookCollectionView: View {
     @EnvironmentObject var networkManager: NetworkMonitor
+    @ObservedObject var viewModel: BookCollectionViewModel
+    public var updateRightButtons: (_ buttons: AnyView) -> Void
+    public var needToHideNavigation: (_ isHidden: Bool) -> Void
     
-    @StateObject private var viewModel: BookCollectionViewModel
     @State private var isSearchOpened: Bool = false {
         didSet {
             withAnimation(.interpolatingSpring) {
@@ -21,15 +23,9 @@ struct BookCollectionView: View {
         }
     }
     
-    var updateRightButtons: (_ buttons: AnyView) -> Void
-    var needToHideNavigation: (_ isHidden: Bool) -> Void
+    
     @StateObject private var shareManager = ShareManager()
     
-    init(viewModel: BookCollectionViewModel, updateRightButtons: @escaping (_: AnyView) -> Void, needToHideNavigation: @escaping (_: Bool) -> Void) {
-        self._viewModel = StateObject(wrappedValue: viewModel)
-        self.updateRightButtons = updateRightButtons
-        self.needToHideNavigation = needToHideNavigation
-    }
 
     var body: some View {
         NavigationStack(path: $viewModel.navigationPath) {

@@ -9,16 +9,15 @@ import SwiftUI
 import SwiftData
 import Combine
 
+
+
 struct RootView: View {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([SavedBooks.self,SavedPDF.self])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-        return try! ModelContainer(for: schema, configurations: [modelConfiguration])
-    }()
+    var modelContext: ModelContext
     
-    @StateObject private var settings = SettingsViewModel()
-    @StateObject private var networkManager = NetworkMonitor()
-    @StateObject private var coordinator = AppCoordinator()
+    @EnvironmentObject private var coordinator: AppCoordinator
+    @EnvironmentObject private var settings: SettingsViewModel
+    @EnvironmentObject private var networkManager: NetworkMonitor
+    
     @State private var rightButtons: AnyView = AnyView(EmptyView())
     @State private var isNavigationBarHidden: Bool = false
     @State private var cancellable = Set<AnyCancellable>()
@@ -73,44 +72,49 @@ struct RootView: View {
     private var contentView: some View {
         switch coordinator.selectedCategory {
         case .main:
-            BookCollectionView(viewModel: BookCollectionViewModel(modelContext: sharedModelContainer.mainContext)){ buttons in
-                rightButtons = AnyView(buttons)
-            } needToHideNavigation: { isHidden in
-                isNavigationBarHidden = isHidden
-            }
+            BookCollectionCoordinator(modelContext: modelContext)
+                .makeView(rightButtons: {
+                    rightButtons = $0
+                }, needToHideNavigation: {
+                    isNavigationBarHidden = $0
+                })
             .environmentObject(networkManager)
             .environmentObject(settings)
 
         case .savedBooks:
-            SavedBooksView(viewModel: SavedBooksViewModel(modelContext: sharedModelContainer.mainContext)) { buttons in
+            SavedBooksView(viewModel: SavedBooksViewModel(modelContext: modelContext)) { buttons in
                 rightButtons = AnyView(buttons)
             } navigateToBookCollection: {
                 coordinator.selectedCategory = .main
             }
             .environmentObject(settings)
-        case .settings:
-            SettingsView { buttons in
-                rightButtons = AnyView(buttons)
-            }
-            .environmentObject(settings)
-            
+        
         case .readLater:
-            ReadLaterView(viewModel: ReadLaterViewModel(modelContext: sharedModelContainer.mainContext), updateRightButtons: { buttons in
+            ReadLaterView(viewModel: ReadLaterViewModel(modelContext: modelContext), updateRightButtons: { buttons in
                 rightButtons = buttons
             }, navigateToBookCollection: {
                 coordinator.selectedCategory = .main
             })
         case .pdfLibrary:
-            PDFLibraryView(viewModel: PDFLibraryViewModel(modelContext: sharedModelContainer.mainContext)) {
+            PDFLibraryView(viewModel: PDFLibraryViewModel(modelContext: modelContext)) {
                 rightButtons = $0
             }
         case .statistics:
-            CircleStatView(viewModel: CircleStatViewModel(bookManager: BooksDataManager(context: sharedModelContainer.mainContext))) {
+            CircleStatView(viewModel: CircleStatViewModel(bookManager: BooksDataManager(context: modelContext))) {
                 rightButtons = $0
             } navigate: {
                 navigateToSelectedCategory($0)
             }
+        case .settings:
+            SettingsCoordinator()
+                .makeView(
+                    settings: settings,
+                    rightButtons: {
+                rightButtons = $0
+            })
+            
         }
+        
     }
     
     private func navigateToSelectedCategory(_ category: BookStat.BookCategory){
@@ -128,8 +132,4 @@ struct RootView: View {
             }
             .store(in: &cancellable)
     }
-}
-
-#Preview {
-    RootView()
 }

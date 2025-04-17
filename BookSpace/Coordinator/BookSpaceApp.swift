@@ -14,7 +14,7 @@ struct BookSpaceApp: App {
     
     var body: some Scene {
         WindowGroup {
-            RootView()
+            AppView()
         }
     }
 }
