@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct CustomNavigationBar<LeftButton: View, RightButtons: View>: View {
+    @EnvironmentObject var settingsVM: SettingsViewModel
     let title: String
     
     let leftButton: LeftButton
@@ -24,7 +25,7 @@ struct CustomNavigationBar<LeftButton: View, RightButtons: View>: View {
         HStack(spacing: 15) {
             leftButton
             Text(title)
-                .font(.system(size: 28, weight: .semibold, design: .rounded))
+                .font(.custom(settingsVM.selectedFont, size: settingsVM.headerFontSize))
                 .foregroundStyle(.blackText)
                 .frame(maxWidth: .infinity,minHeight: 80, maxHeight: 80,alignment: .leading)
             HStack {

@@ -42,6 +42,7 @@ struct RootView: View {
                         rightButtons
                     }
                     .opacity(isNavigationBarHidden ? 0 : 1)
+                    .environmentObject(settings)
                 }
                 
                 if coordinator.isSideMenuVisible {

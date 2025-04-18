@@ -10,7 +10,9 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var settings: SettingsViewModel
+    @Environment(\.openURL) var openURL
     @State private var isColorPickerPresented: Bool = false
+    @State private var showCameraAlert : Bool = false
     
     var updateRightButtons: (_ buttons: AnyView) -> Void
     
@@ -28,44 +30,92 @@ struct SettingsView: View {
                     Text("No buttons")
                 ))
             }
+            .fullScreenCover(isPresented: $isColorPickerPresented) {
+                CustomColorPickerView(color: $settings.backgroundColor, goBack: {
+                    isColorPickerPresented.toggle()
+                })
+            }
+            .alert("Camera Access", isPresented: $showCameraAlert) {
+                Button("Go to settings") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        openURL(url)
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("To change camera access, please go to Settings -> Privacy -> Camera. ")
+            }
+            .onAppear {
+                settings.toggleCameraAccess { _ in }
+            }
+            
         }
     }
     
     private var formView: some View {
+        
         Form {
             Section {
                 Picker("Select font", selection: $settings.selectedFont) {
-                    Text("System").tag("System")
-                    Text("Serif").tag("Serif")
-                    Text("Monospaced").tag("Monospaced")
+                    ForEach(UIFont.familyNames,id: \.self) { fontName in
+                        Text(fontName)
+                            .font(.custom(fontName, size: 20))
+                    }
+                    
                 }
+                .pickerStyle(.wheel)
             } header: {
                 Text("Font")
             }
             
             Section {
-                Slider(value: $settings.headerFontSize, in: 14...30, step: 1)
-                    .tint(.skyBlue)
+                VStack {
+                    Text("Font size example")
+                        .font(.custom(settings.selectedFont, size: settings.headerFontSize))
+                    Slider(value: $settings.headerFontSize, in: 14...30, step: 1)
+                        .tint(.skyBlue)
+                }
             } header: {
                 Text("Header font size")
             }
+            .listRowSeparator(.hidden)
             
             Section {
-                HStack {
-                    Text("Open Color picker")
-                    Spacer()
-                    Circle()
-                        .foregroundStyle(settings.backgroundColor)
-                        .frame(width: 30, height: 30)
-                        
+                Button {
+                    isColorPickerPresented.toggle()
+                } label: {
+                    HStack {
+                        Text("Open Color picker")
+                        Spacer()
+                        Circle()
+                            .foregroundStyle(settings.backgroundColor)
+                            .frame(width: 30, height: 30)
+                            .overlay {
+                                Circle()
+                                    .stroke(Color.black, lineWidth: 1)
+                            }
+                    }
                 }
+                .foregroundStyle(.black)
             } header: {
-                Text("App Background Font")
+                Text("Background Color")
             }
             
             Section {
-                Toggle("Camera access", isOn: $settings.isCameraAccessAllowed)
-                    .tint(.skyBlue)
+                Toggle("Camera access", isOn: Binding(get: {
+                    settings.isCameraAccessAllowed
+                }, set: { newValue in
+                    if newValue {
+                        settings.toggleCameraAccess { showSettingAlert in
+                            if showSettingAlert {
+                                showCameraAlert = true
+                            }
+                        }
+                    } else {
+                        showCameraAlert = true
+                    }
+                }) )
+                .tint(.skyBlue)
             } header: {
                 Text("Access to camera")
             }
@@ -93,14 +143,17 @@ struct SettingsView: View {
                 } label: {
                     Text("Clean data")
                 }
-
-
+                
+                
             } header: {
                 Text("Clean cache and data")
             }
         }
         .scrollContentBackground(.hidden)
     }
+
+    
+    
 }
 
 #Preview {

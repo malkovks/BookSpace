@@ -10,5 +10,9 @@ extension UserDefaults {
     static func registerPDFDefaults() {
         PDFSettingsViewModel.registerDefaults()
     }
+    
+    static func registerSettingsDefaults() {
+        
+    }
 }
 

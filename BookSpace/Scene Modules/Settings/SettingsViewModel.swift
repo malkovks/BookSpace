@@ -17,14 +17,17 @@ class SettingsViewModel: ObservableObject {
     }
     
     var backgroundColor: Color = .skyBlue {
-        
         didSet {
             let hexColor = backgroundColor.hexString()
             updateIfneeded(oldValue.hexString(), hexColor, key: SettingsKeys.backgroundColor)
         }
     }
-    var isCameraAccessAllowed: Bool = true
-    var appearanceMode: AppearanceMode = .automatic
+    var isCameraAccessAllowed: Bool = true {
+        didSet { updateIfneeded(oldValue, isCameraAccessAllowed, key: SettingsKeys.isCameraAccessAllowed) }
+    }
+    var appearanceMode: AppearanceMode = .automatic {
+        didSet { updateIfneeded( oldValue, appearanceMode, key: SettingsKeys.appearanceMode) }
+    }
     
     
     enum AppearanceMode: String, CaseIterable, Identifiable {
@@ -39,6 +42,34 @@ class SettingsViewModel: ObservableObject {
         static let backgroundColor = "backgroundColor"
         static let isCameraAccessAllowed = "isCameraAccessAllowed"
         static let appearanceMode = "appearanceMode"
+    }
+    
+    init(){
+        selectedFont = UserDefaults.standard.string(forKey: SettingsKeys.selectedFont) ?? "System"
+        headerFontSize = CGFloat(UserDefaults.standard.double(forKey: SettingsKeys.headerFontSize))
+        backgroundColor = Color(hex: UserDefaults.standard.string(forKey: SettingsKeys.backgroundColor) ?? backgroundColor.hexString())
+        isCameraAccessAllowed = UserDefaults.standard.bool(forKey: SettingsKeys.isCameraAccessAllowed)
+        appearanceMode = AppearanceMode(rawValue: UserDefaults.standard.string(forKey: SettingsKeys.appearanceMode) ?? AppearanceMode.automatic.rawValue) ?? .automatic
+    }
+    
+    @MainActor
+    func toggleCameraAccess(completion: @escaping (_ showSettingAlert: Bool) -> Void ){
+        Task {
+            await CameraAccessManager.shared.requestAccess { [weak self] result in
+                switch result {
+                case .success(let success):
+                    if success {
+                        self?.isCameraAccessAllowed = true
+                    } else {
+                        self?.isCameraAccessAllowed = false
+                        completion(true)
+                    }
+                case .failure:
+                    self?.isCameraAccessAllowed = false
+                    completion(true)
+                }
+            }
+        }
     }
     
     private func updateIfneeded<T: Equatable>(_ old: T, _ new: T, key: String) {

@@ -21,9 +21,7 @@ class CameraAccessManager {
     
     private init() {}
     
-    func checkCameraAccess() async throws -> AVAuthorizationStatus {
-        return AVCaptureDevice.authorizationStatus(for: .video)
-    }
+    
     
     func requestAccess(completion: @escaping (_ result: Result<Bool,CameraAccess>) -> Void) async {
         guard checkVisionKitAccess() else {
@@ -56,7 +54,11 @@ class CameraAccessManager {
         }
     }
     
-    func checkVisionKitAccess() -> Bool {
+    private func checkCameraAccess() async throws -> AVAuthorizationStatus {
+        return AVCaptureDevice.authorizationStatus(for: .video)
+    }
+    
+    private func checkVisionKitAccess() -> Bool {
         if #available(iOS 13.0, *) {
             return VNDocumentCameraViewController.isSupported
         }
