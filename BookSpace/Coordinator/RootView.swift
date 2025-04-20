@@ -25,6 +25,7 @@ struct RootView: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .topLeading) {
+                settings.backgroundColor.ignoresSafeArea()
                 contentView
                     .frame(maxWidth: .infinity,maxHeight: .infinity)
                     .transition(.opacity)

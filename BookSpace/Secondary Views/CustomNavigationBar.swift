@@ -26,6 +26,9 @@ struct CustomNavigationBar<LeftButton: View, RightButtons: View>: View {
             leftButton
             Text(title)
                 .font(.custom(settingsVM.selectedFont, size: settingsVM.headerFontSize))
+                .fontWeight(settingsVM.isTextBold ? .black : .regular)
+                .italic(settingsVM.isTextItalic)
+                .underline(settingsVM.isTextUnderlined)
                 .foregroundStyle(.blackText)
                 .frame(maxWidth: .infinity,minHeight: 80, maxHeight: 80,alignment: .leading)
             HStack {

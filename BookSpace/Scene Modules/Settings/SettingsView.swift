@@ -11,8 +11,10 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject var settings: SettingsViewModel
     @Environment(\.openURL) var openURL
+    @Environment(\.colorScheme) var colorScheme
     @State private var isColorPickerPresented: Bool = false
     @State private var showCameraAlert : Bool = false
+    @State private var showInfoView: Bool = false
     
     var updateRightButtons: (_ buttons: AnyView) -> Void
     
@@ -20,21 +22,32 @@ struct SettingsView: View {
         NavigationStack {
             
             ZStack(alignment: .top) {
-                Color.colorBackground
+                settings.backgroundColor
                     .ignoresSafeArea()
                 formView
                     .padding(.top, 90)
             }
             .onAppear {
                 updateRightButtons(AnyView(
-                    Text("No buttons")
+                    Button(action: {
+                        showInfoView.toggle()
+                    }, label: {
+                        createImage("questionmark.circle")
+                    })
                 ))
             }
             .fullScreenCover(isPresented: $isColorPickerPresented) {
                 CustomColorPickerView(color: $settings.backgroundColor, goBack: {
                     isColorPickerPresented.toggle()
                 })
+                .preferredColorScheme(.light)
+                
             }
+            
+            .sheet(isPresented: $showInfoView, content: {
+                SettingsInfoView()
+            })
+            
             .alert("Camera Access", isPresented: $showCameraAlert) {
                 Button("Go to settings") {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -69,6 +82,66 @@ struct SettingsView: View {
             }
             
             Section {
+                HStack(spacing: 16) {
+                    Button {
+                        settings.isTextBold.toggle()
+                    } label: {
+                        Text("B")
+                            
+                            .font(.system(size: 18,weight: .bold))
+                            .foregroundStyle(settings.isTextBold ? .primary : .secondary)
+                            .padding(.vertical,8)
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(settings.isTextBold ? .skyBlue : .clear)
+                                    .stroke(.blackText, lineWidth: 1)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .animation(.spring(duration: 0.4, bounce: 0.2, blendDuration: 0.3), value: settings.isTextBold)
+
+                    Button {
+                        settings.isTextItalic.toggle()
+                    } label: {
+                        Text("I")
+                            .italic()
+                            .font(.system(size: 18))
+                            .padding(.vertical,8)
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(settings.isTextItalic ? .skyBlue : .clear)
+                                    .stroke(.blackText, lineWidth: 1)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .animation(.spring(duration: 0.4, bounce: 0.2, blendDuration: 0.3), value: settings.isTextItalic)
+                    
+                    Button {
+                        settings.isTextUnderlined.toggle()
+                    } label: {
+                        Text("U")
+                            .underline()
+                            .font(.system(size: 18))
+                            .padding(.vertical,8)
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(settings.isTextUnderlined ? .skyBlue : .clear)
+                                    .stroke(.blackText, lineWidth: 1)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .animation(.spring(duration: 0.4, bounce: 0.2, blendDuration: 0.3), value: settings.isTextUnderlined)
+                }
+                .frame(maxWidth: .infinity)
+                
+            } header: {
+                Text("Text style")
+            }
+            
+            Section {
                 VStack {
                     Text("Font size example")
                         .font(.custom(settings.selectedFont, size: settings.headerFontSize))
@@ -96,7 +169,7 @@ struct SettingsView: View {
                             }
                     }
                 }
-                .foregroundStyle(.black)
+                .foregroundStyle(.blackText)
             } header: {
                 Text("Background Color")
             }
@@ -109,6 +182,8 @@ struct SettingsView: View {
                         settings.toggleCameraAccess { showSettingAlert in
                             if showSettingAlert {
                                 showCameraAlert = true
+                            } else {
+                                settings.isCameraAccessAllowed = true
                             }
                         }
                     } else {
@@ -135,13 +210,13 @@ struct SettingsView: View {
                 Button {
                     print("Clean cache")
                 } label: {
-                    Text("Clean Cache")
+                    actionTextView("Clean cache")
                 }
                 
                 Button {
                     print("Clean data")
                 } label: {
-                    Text("Clean data")
+                    actionTextView("Clean Data")
                 }
                 
                 
@@ -152,16 +227,14 @@ struct SettingsView: View {
         .scrollContentBackground(.hidden)
     }
 
-    
-    
-}
-
-#Preview {
-    let settings = SettingsViewModel()
-        
-        return SettingsView { buttons in
-            
+    private func actionTextView(_ text: String) -> some View {
+        return HStack {
+            Spacer()
+            Text(text)
+                .foregroundStyle(.updateBlue)
+            Spacer()
         }
-        .environmentObject(settings)
-
+    }
+    
+    
 }

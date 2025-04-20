@@ -58,14 +58,14 @@ struct BookCollectionView: View {
                         progressView
                     }
                 }
-                .task {
-                    await viewModel.fetchBooks()
-                }
                 
                 .onAppear {
                     updateRightButtons(
                         AnyView(navigationButtons)
                     )
+                    Task {
+                        await viewModel.fetchBooks()
+                    }
                 }
                 .onReceive(networkManager.$isConnected) { isConnected in
                     if !isConnected {
@@ -83,6 +83,7 @@ struct BookCollectionView: View {
                 .statusNotification(isPresented: $viewModel.showAlertView, type: viewModel.status,message: viewModel.message, duration: 3.0)
             }
         }
+        .background(Color.clear)
     }
     
     private func filterView(_ geometry: GeometryProxy) -> some View {
@@ -187,6 +188,7 @@ struct BookCollectionView: View {
             .padding(.top,90)
             .padding(.horizontal,10)
             .opacity(viewModel.isLoading ? 0 : 1)
+            .background(Color.clear)
         }
     }
     

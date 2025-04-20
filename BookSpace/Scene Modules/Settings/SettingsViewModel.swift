@@ -6,9 +6,13 @@
 // Copyright (c) 2024 Malkov Konstantin . All rights reserved.
 
 import SwiftUI
+import SwiftData
 
 @Observable
 class SettingsViewModel: ObservableObject {
+    
+    let modelContext: ModelContext
+    
     var selectedFont: String = "System" {
         didSet { updateIfneeded(oldValue, selectedFont, key: SettingsKeys.selectedFont) }
     }
@@ -16,7 +20,7 @@ class SettingsViewModel: ObservableObject {
         didSet { updateIfneeded(oldValue , headerFontSize, key: SettingsKeys.headerFontSize)}
     }
     
-    var backgroundColor: Color = .skyBlue {
+    var backgroundColor: Color = .secondary {
         didSet {
             let hexColor = backgroundColor.hexString()
             updateIfneeded(oldValue.hexString(), hexColor, key: SettingsKeys.backgroundColor)
@@ -25,14 +29,37 @@ class SettingsViewModel: ObservableObject {
     var isCameraAccessAllowed: Bool = true {
         didSet { updateIfneeded(oldValue, isCameraAccessAllowed, key: SettingsKeys.isCameraAccessAllowed) }
     }
-    var appearanceMode: AppearanceMode = .automatic {
-        didSet { updateIfneeded( oldValue, appearanceMode, key: SettingsKeys.appearanceMode) }
+    var appearanceMode: AppearanceMode = {
+        let raw = UserDefaults.standard.string(forKey: SettingsKeys.appearanceMode)
+                  ?? AppearanceMode.automatic.rawValue
+        return AppearanceMode(rawValue: raw) ?? .automatic
+    }() {
+        didSet {
+            UserDefaults.standard.set(appearanceMode.rawValue,
+                                      forKey: SettingsKeys.appearanceMode)
+        }
     }
     
+    var isTextBold: Bool = false {
+        didSet {
+            updateIfneeded(oldValue, isTextBold, key: SettingsKeys.boldFont)
+        }
+    }
+    
+    var isTextItalic: Bool = false {
+        didSet {
+            updateIfneeded(oldValue, isTextItalic, key: SettingsKeys.italicFont)
+        }
+    }
+    
+    var isTextUnderlined: Bool = false {
+        didSet {
+            updateIfneeded(oldValue, isTextUnderlined, key: SettingsKeys.underlineFont)
+        }
+    }
     
     enum AppearanceMode: String, CaseIterable, Identifiable {
         var id: String { rawValue }
-        
         case light, dark, automatic
     }
     
@@ -42,14 +69,21 @@ class SettingsViewModel: ObservableObject {
         static let backgroundColor = "backgroundColor"
         static let isCameraAccessAllowed = "isCameraAccessAllowed"
         static let appearanceMode = "appearanceMode"
+        static let boldFont = "boldFont"
+        static let italicFont = "italicFont"
+        static let underlineFont = "underlineFont"
     }
     
-    init(){
+    init(modelContext: ModelContext){
+        self.modelContext = modelContext
         selectedFont = UserDefaults.standard.string(forKey: SettingsKeys.selectedFont) ?? "System"
         headerFontSize = CGFloat(UserDefaults.standard.double(forKey: SettingsKeys.headerFontSize))
         backgroundColor = Color(hex: UserDefaults.standard.string(forKey: SettingsKeys.backgroundColor) ?? backgroundColor.hexString())
         isCameraAccessAllowed = UserDefaults.standard.bool(forKey: SettingsKeys.isCameraAccessAllowed)
         appearanceMode = AppearanceMode(rawValue: UserDefaults.standard.string(forKey: SettingsKeys.appearanceMode) ?? AppearanceMode.automatic.rawValue) ?? .automatic
+        isTextBold = UserDefaults.standard.bool(forKey: SettingsKeys.boldFont)
+        isTextItalic = UserDefaults.standard.bool(forKey: SettingsKeys.italicFont)
+        isTextUnderlined = UserDefaults.standard.bool(forKey: SettingsKeys.underlineFont)
     }
     
     @MainActor
