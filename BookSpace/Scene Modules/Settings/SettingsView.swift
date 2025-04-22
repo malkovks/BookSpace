@@ -15,8 +15,13 @@ struct SettingsView: View {
     @State private var isColorPickerPresented: Bool = false
     @State private var showCameraAlert : Bool = false
     @State private var showInfoView: Bool = false
+    @State private var isRemoveAllData: Bool = false
+    @State private var isCleanAllCache: Bool = false
     
     var updateRightButtons: (_ buttons: AnyView) -> Void
+    
+    
+    
     
     var body: some View {
         NavigationStack {
@@ -26,6 +31,10 @@ struct SettingsView: View {
                     .ignoresSafeArea()
                 formView
                     .padding(.top, 90)
+                if settings.isLoading {
+                    loadingView
+                        .transition(.scale.combined(with: .opacity))
+                }
             }
             .onAppear {
                 updateRightButtons(AnyView(
@@ -48,6 +57,24 @@ struct SettingsView: View {
                 SettingsInfoView()
             })
             
+            .alert(isPresented: $isCleanAllCache, content: {
+                Alert(title: Text("Warning"),
+                      message: Text("Do you want to clean all cache data?"),
+                      primaryButton: .destructive(Text("Clean"),action: {
+                    ImageCache.shared.removeAll()
+                }),
+                      secondaryButton: .cancel())
+            })
+            
+            .alert(isPresented: $isRemoveAllData, content: {
+                Alert(title: Text("Warning"),
+                      message: Text("Do you want to delete all saved data?. Actually it will delete all loaded,scanned files"),
+                      primaryButton: .destructive(Text("Delete"),action: {
+                    settings.deleteAllData()
+                }),
+                      secondaryButton: .cancel())
+            })
+            
             .alert("Camera Access", isPresented: $showCameraAlert) {
                 Button("Go to settings") {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -63,6 +90,16 @@ struct SettingsView: View {
             }
             
         }
+    }
+    
+    private var loadingView: some View {
+        VStack {
+            HStack {
+                ProgressView()
+                    .progressViewStyle(.circular)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
     private var formView: some View {
@@ -208,13 +245,13 @@ struct SettingsView: View {
             
             Section {
                 Button {
-                    print("Clean cache")
+                    isCleanAllCache.toggle()
                 } label: {
                     actionTextView("Clean cache")
                 }
                 
                 Button {
-                    print("Clean data")
+                    isRemoveAllData.toggle()
                 } label: {
                     actionTextView("Clean Data")
                 }
@@ -227,12 +264,19 @@ struct SettingsView: View {
         .scrollContentBackground(.hidden)
     }
 
-    private func actionTextView(_ text: String) -> some View {
+    private func actionTextView(_ text: String,_ weight: String? = nil) -> some View {
         return HStack {
             Spacer()
             Text(text)
+                .font(.title3)
                 .foregroundStyle(.updateBlue)
             Spacer()
+            if let weight {
+                Text(weight + "Mbs")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary.opacity(0.5))
+                Spacer()
+            }
         }
     }
     

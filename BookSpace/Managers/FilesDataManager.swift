@@ -8,7 +8,7 @@
 import SwiftData
 import Foundation
 
-@MainActor
+
 class FilesDataManager {
     private let context: ModelContext
     
@@ -41,7 +41,7 @@ class FilesDataManager {
             print("❌ Can not copy file to documents directory")
             return
         }
-
+        
         do {
             let bookmarkData = try localURL.bookmarkData(options: .minimalBookmark)
             let pdfData = try Data(contentsOf: localURL)
@@ -57,7 +57,18 @@ class FilesDataManager {
         saveChanges()
     }
     
-    private func copyPDFToDocumentsDirectory(from sourceURL: URL) -> URL? {
+    func deleteAllPDFFiles() throws {
+        let descriptor = FetchDescriptor<SavedPDF>()
+        let books = try context.fetch(descriptor)
+        books.forEach(context.delete)
+        saveChanges()
+    }
+    
+}
+
+private extension FilesDataManager {
+    
+    func copyPDFToDocumentsDirectory(from sourceURL: URL) -> URL? {
         guard sourceURL.startAccessingSecurityScopedResource() else {
             print("❌ Did not get access to the resource")
             return nil
@@ -82,7 +93,7 @@ class FilesDataManager {
         }
     }
     
-    private func saveChanges(){
+    func saveChanges(){
         do {
             try context.save()
         } catch {

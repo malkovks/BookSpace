@@ -8,7 +8,7 @@
 import SwiftData
 import WidgetKit
 
-@MainActor
+
 class BooksDataManager {
     private let context: ModelContext
     
@@ -47,6 +47,15 @@ class BooksDataManager {
         saveChanges()
     }
     
+    func deleteAllLoadedBooks() throws {
+        let descriptor = FetchDescriptor<SavedBooks>()
+        let books = try context.fetch(descriptor)
+        books.forEach(context.delete)
+        try context.save()
+    }
+}
+
+extension BooksDataManager {
     //update statuses for books
     func updatePlannedBooks(_ book: Book,_ isReadLater: Bool, completion: ((_ result: Status) -> Void)? = nil) {
         let descriptor = FetchDescriptor<SavedBooks>(predicate: #Predicate { plannedBooks in
@@ -108,6 +117,7 @@ class BooksDataManager {
         }
     }
 }
+
 private extension BooksDataManager {
     
     private func saveChanges() {
@@ -122,9 +132,7 @@ private extension BooksDataManager {
         
         let userDefaults = UserDefaults(suiteName: "group.malkov.ks.BookSpace")
         userDefaults?.set(favoriteBooksCount, forKey: "favoritesCount")
-        print("favoriteBooksCount: \(userDefaults!.value(forKey: "favoritesCount") as! Int)")
         userDefaults?.set(toReadCount, forKey: "toReadCount")
-        print("to Read Count: \(userDefaults!.value(forKey: "toReadCount") as! Int)")
         WidgetCenter.shared.reloadAllTimelines()
     }
 }

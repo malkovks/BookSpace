@@ -12,6 +12,10 @@ import SwiftData
 class SettingsViewModel: ObservableObject {
     
     let modelContext: ModelContext
+    let filesManager: FilesDataManager
+    let dataManager: BooksDataManager
+    
+    var isLoading: Bool = false
     
     var selectedFont: String = "System" {
         didSet { updateIfneeded(oldValue, selectedFont, key: SettingsKeys.selectedFont) }
@@ -78,12 +82,39 @@ class SettingsViewModel: ObservableObject {
         self.modelContext = modelContext
         selectedFont = UserDefaults.standard.string(forKey: SettingsKeys.selectedFont) ?? "System"
         headerFontSize = CGFloat(UserDefaults.standard.double(forKey: SettingsKeys.headerFontSize))
-        backgroundColor = Color(hex: UserDefaults.standard.string(forKey: SettingsKeys.backgroundColor) ?? backgroundColor.hexString())
+        backgroundColor = Color(hex: UserDefaults.standard.string(forKey: SettingsKeys.backgroundColor) ?? Color.skyBlue.hexString())
         isCameraAccessAllowed = UserDefaults.standard.bool(forKey: SettingsKeys.isCameraAccessAllowed)
         appearanceMode = AppearanceMode(rawValue: UserDefaults.standard.string(forKey: SettingsKeys.appearanceMode) ?? AppearanceMode.automatic.rawValue) ?? .automatic
         isTextBold = UserDefaults.standard.bool(forKey: SettingsKeys.boldFont)
         isTextItalic = UserDefaults.standard.bool(forKey: SettingsKeys.italicFont)
         isTextUnderlined = UserDefaults.standard.bool(forKey: SettingsKeys.underlineFont)
+        self.filesManager = FilesDataManager(context: modelContext)
+        self.dataManager = BooksDataManager(context: modelContext)
+    }
+    
+    func cleanCache(){
+        isLoading = true
+        Task {
+            do {
+                
+            } catch {
+                
+            }
+        }
+    }
+    
+    func deleteAllData(){
+        isLoading = true
+        Task {
+            do {
+                async let deleteBooks: () = try dataManager.deleteAllLoadedBooks()
+                async let deleteFiles: () = try filesManager.deleteAllPDFFiles()
+                _ = try await [deleteBooks, deleteFiles]
+            } catch {
+                print("Error deleting files from storages: \(error.localizedDescription)")
+            }
+            await MainActor.run { isLoading = false }
+        }
     }
     
     @MainActor

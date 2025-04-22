@@ -36,4 +36,9 @@ extension UIImage {
         
         return UIColor(red: CGFloat(avgRed) / 255.0, green: CGFloat(avgGreen) / 255.0, blue: CGFloat(avgBlue) / 255.0, alpha: 1)
     }
+    
+    var diskSizeInBytes: Int {
+        guard let cgImage = self.cgImage else { return 0 }
+        return cgImage.bytesPerRow * cgImage.height
+    }
 }
